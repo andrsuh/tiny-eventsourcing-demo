@@ -17,6 +17,7 @@
 		<java.version>11</java.version>
 		<kotlin.version>1.6.21</kotlin.version>
 		<tiny.es.version>2.7.4</tiny.es.version>
+		<jbcrypt.version>0.4</jbcrypt.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -58,7 +59,15 @@
 			<version>${tiny.es.version}</version>
 		</dependency>
 
-<!--		<dependency>-->
+		<!-- https://mvnrepository.com/artifact/org.mindrot/jbcrypt -->
+		<dependency>
+			<groupId>org.mindrot</groupId>
+			<artifactId>jbcrypt</artifactId>
+			<version>${jbcrypt.version}</version>
+		</dependency>
+
+
+		<!--		<dependency>-->
 <!--			<groupId>ru.quipy</groupId>-->
 <!--			<artifactId>tiny-mongo-event-store-spring-boot-starter</artifactId>-->
 <!--			<version>${tiny.es.version}</version>-->

@@ -1,3 +1,5 @@
+package ru.quipy.controller
+
 import org.springframework.web.bind.annotation.* // ktlint-disable no-wildcard-imports
 import ru.quipy.api.auth.UserAggregate
 import ru.quipy.api.auth.UserCreatedEvent
@@ -8,13 +10,13 @@ import java.util.*
 @RestController
 @RequestMapping("/users")
 class UserController(
-    val projectEsService: EventSourcingService<UUID, UserAggregate, UserAggregateState>,
+    val userEsService: EventSourcingService<UUID, UserAggregate, UserAggregateState>,
 ) {
     @PostMapping("/create")
     fun createUser(
         @RequestBody dto: createUserDto,
     ): UserCreatedEvent {
-        return projectEsService.create {
+        return userEsService.create {
             it.create(UUID.randomUUID(), dto.nickName, dto.name, dto.password)
         }
     }
