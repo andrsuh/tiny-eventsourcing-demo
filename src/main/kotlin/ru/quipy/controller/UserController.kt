@@ -1,6 +1,8 @@
 package ru.quipy.controller
 
-import org.springframework.web.bind.annotation.* // ktlint-disable no-wildcard-imports
+import org.springframework.http.HttpStatus
+import org.springframework.web.bind.annotation.*
+import org.springframework.web.server.ResponseStatusException
 import ru.quipy.api.auth.UserAggregate
 import ru.quipy.api.auth.UserCreatedEvent
 import ru.quipy.core.EventSourcingService
@@ -14,15 +16,20 @@ class UserController(
 ) {
     @PostMapping("/create")
     fun createUser(
-        @RequestBody dto: createUserDto,
+        @RequestBody dto: CreateUserDto,
     ): UserCreatedEvent {
         return userEsService.create {
             it.create(UUID.randomUUID(), dto.nickName, dto.name, dto.password)
         }
     }
+
+    @GetMapping("/{userId}")
+    fun getUser(@PathVariable userId: UUID) : UserAggregateState? {
+        return userEsService.getState(userId)
+    }
 }
 
-data class createUserDto(
+data class CreateUserDto(
     val nickName: String,
     val name: String,
     val password: String,

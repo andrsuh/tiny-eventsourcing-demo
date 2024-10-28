@@ -4,10 +4,14 @@ import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import ru.quipy.api.ParticipantAggregate
 import ru.quipy.api.ProjectAggregate
+import ru.quipy.api.TaskServiceAggregate
 import ru.quipy.api.auth.UserAggregate
 import ru.quipy.core.EventSourcingServiceFactory
+import ru.quipy.logic.ParticipantAggregateState
 import ru.quipy.logic.ProjectAggregateState
+import ru.quipy.logic.TaskServiceAggregateState
 import ru.quipy.logic.auth.UserAggregateState
 import ru.quipy.projections.AnnotationBasedProjectEventsSubscriber
 import ru.quipy.streams.AggregateEventStreamManager
@@ -60,6 +64,12 @@ class EventSourcingLibConfiguration {
 
     @Bean
     fun userEsService() = eventSourcingServiceFactory.create<UUID, UserAggregate, UserAggregateState>()
+
+    @Bean
+    fun participantEsService() = eventSourcingServiceFactory.create<UUID, ParticipantAggregate, ParticipantAggregateState>()
+
+    @Bean
+    fun taskServiceEsService() = eventSourcingServiceFactory.create<UUID, TaskServiceAggregate, TaskServiceAggregateState>()
 
     @PostConstruct
     fun init() {
