@@ -14,7 +14,7 @@ class ProjectAggregateState : AggregateState<UUID, ProjectAggregate> {
     lateinit var projectTitle: String
     lateinit var creatorId: String
     var tasks = mutableMapOf<UUID, TaskEntity>()
-    var projectTags = mutableMapOf<UUID, TagEntity>()
+    var projectStatuses = mutableMapOf<UUID, StatusEntity>()
 
     override fun getId() = projectId
 
@@ -28,14 +28,14 @@ class ProjectAggregateState : AggregateState<UUID, ProjectAggregate> {
     }
 
     @StateTransitionFunc
-    fun tagCreatedApply(event: TagCreatedEvent) {
-        projectTags[event.tagId] = TagEntity(event.tagId, event.tagName)
+    fun statusCreatedApply(event: StatusCreatedEvent) {
+        projectStatuses[event.statusId] = StatusEntity(event.statusId, event.statusName, event.statusColor)
         updatedAt = createdAt
     }
 
     @StateTransitionFunc
     fun taskCreatedApply(event: TaskCreatedEvent) {
-        tasks[event.taskId] = TaskEntity(event.taskId, event.taskName, mutableSetOf())
+        tasks[event.taskId] = TaskEntity(event.taskId, event.taskName, event.taskDescription, mutableSetOf())
         updatedAt = createdAt
     }
 }
@@ -43,20 +43,22 @@ class ProjectAggregateState : AggregateState<UUID, ProjectAggregate> {
 data class TaskEntity(
     val id: UUID = UUID.randomUUID(),
     val name: String,
-    val tagsAssigned: MutableSet<UUID>
+    val description: String,
+    val statusesAssigned: MutableSet<UUID>
 )
 
-data class TagEntity(
+data class StatusEntity(
     val id: UUID = UUID.randomUUID(),
-    val name: String
+    val name: String,
+    val color: String
 )
 
 /**
  * Demonstrates that the transition functions might be representer by "extension" functions, not only class members functions
  */
 @StateTransitionFunc
-fun ProjectAggregateState.tagAssignedApply(event: TagAssignedToTaskEvent) {
-    tasks[event.taskId]?.tagsAssigned?.add(event.tagId)
+fun ProjectAggregateState.statusAssignedApply(event: StatusAssignedToTaskEvent) {
+    tasks[event.taskId]?.statusesAssigned?.add(event.statusId)
         ?: throw IllegalArgumentException("No such task: ${event.taskId}")
     updatedAt = createdAt
 }
