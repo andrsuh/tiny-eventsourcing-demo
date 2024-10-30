@@ -27,9 +27,9 @@ import javax.annotation.PostConstruct
  * private lateinit var aggregateRegistry: AggregateRegistry
  *
  * aggregateRegistry.register(ProjectAggregate::class, ProjectAggregateState::class) {
- *     registerStateTransition(TagCreatedEvent::class, ProjectAggregateState::tagCreatedApply)
+ *     registerStateTransition(StatusCreatedEvent::class, ProjectAggregateState::statusCreatedApply)
  *     registerStateTransition(TaskCreatedEvent::class, ProjectAggregateState::taskCreatedApply)
- *     registerStateTransition(TagAssignedToTaskEvent::class, ProjectAggregateState::tagAssignedApply)
+ *     registerStateTransition(StatusAssignedToTaskEvent::class, ProjectAggregateState::statusAssignedApply)
  * }
  * ```
  */
