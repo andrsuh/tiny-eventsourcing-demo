@@ -12,7 +12,7 @@ class ProjectAggregateState : AggregateState<UUID, ProjectAggregate> {
     var updatedAt: Long = System.currentTimeMillis()
 
     lateinit var projectTitle: String
-    lateinit var creatorId: String
+    lateinit var creatorId: UUID
     var tasks = mutableMapOf<UUID, TaskEntity>()
     var projectTags = mutableMapOf<UUID, TagEntity>()
 
@@ -53,10 +53,10 @@ data class TagEntity(
 
 /**
  * Demonstrates that the transition functions might be representer by "extension" functions, not only class members functions
- */
-@StateTransitionFunc
-fun ProjectAggregateState.tagAssignedApply(event: TagAssignedToTaskEvent) {
-    tasks[event.taskId]?.tagsAssigned?.add(event.tagId)
-        ?: throw IllegalArgumentException("No such task: ${event.taskId}")
-    updatedAt = createdAt
-}
+// */
+//@StateTransitionFunc
+//fun ProjectAggregateState.tagAssignedApply(event: TagAssignedToTaskEvent) {
+//    tasks[event.taskId]?.tagsAssigned?.add(event.tagId)
+//        ?: throw IllegalArgumentException("No such task: ${event.taskId}")
+//    updatedAt = createdAt
+//}
