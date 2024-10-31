@@ -21,9 +21,6 @@ class ProjectEventsSubscriber {
     @Autowired
     lateinit var subscriptionsManager: AggregateSubscriptionsManager
 
-    @Autowired
-    lateinit var userService: EventSourcingService<UUID, UserAggregate, UserAggregateState>
-
     @PostConstruct
     fun init() {
         subscriptionsManager.createSubscriber(ProjectAggregate::class, "project-subscriber") {
