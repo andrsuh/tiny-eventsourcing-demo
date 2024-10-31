@@ -15,7 +15,6 @@ class TaskAndStatusAggregateState : AggregateState<UUID, TaskAndStatusAggregate>
     lateinit var projectId: UUID
     lateinit var name: String
     var statusId: UUID? = null
-    lateinit var color: Color
     val executors = mutableListOf<UUID>()
 
     override fun getId() = taskId
@@ -26,7 +25,6 @@ class TaskAndStatusAggregateState : AggregateState<UUID, TaskAndStatusAggregate>
         projectId = event.projectId
         name = event.taskName
         description = event.description
-        color = if (Color.getColor(event.color) != null) Color.getColor(event.color) else throw IllegalArgumentException("Incorrect color type.")
         updatedAt = createdAt
     }
 

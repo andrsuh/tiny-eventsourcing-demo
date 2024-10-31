@@ -3,7 +3,7 @@ package ru.quipy.logic
 import ru.quipy.api.*
 import java.util.*
 
-fun TaskAndStatusAggregateState.createTask(id: UUID, projectId: UUID, name: String, description: String, color: String): TaskCreatedEvent {
+fun TaskAndStatusAggregateState.createTask(id: UUID, projectId: UUID, name: String, description: String): TaskCreatedEvent {
     if (name.isEmpty()) {
         throw IllegalArgumentException("Task name should not be empty.")
     }
@@ -11,7 +11,7 @@ fun TaskAndStatusAggregateState.createTask(id: UUID, projectId: UUID, name: Stri
 //        throw IllegalArgumentException("Task name already exists: $name")
 //    }
 
-    return TaskCreatedEvent(id, projectId, name, description, color)
+    return TaskCreatedEvent(id, projectId, name, description)
 }
 //fun ProjectAggregateState.createTag(name: String): TagCreatedEvent {
 //    if (projectTags.values.any { it.name == name }) {

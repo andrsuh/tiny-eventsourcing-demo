@@ -13,7 +13,7 @@ class TaskController(
 ) {
     @PostMapping("")
     fun createTask(@RequestBody body: CreateTaskDto): TaskCreatedEvent {
-        return tasksEsService.create { it.createTask(UUID.randomUUID(), body.projectId, body.name, body.description, body.color) }
+        return tasksEsService.create { it.createTask(UUID.randomUUID(), body.projectId, body.name, body.description) }
     }
 
     @GetMapping("/{taskId}")
@@ -46,8 +46,7 @@ class TaskController(
 data class CreateTaskDto(
         val projectId: UUID,
         val name: String,
-        val description: String,
-        val color: String
+        val description: String
 )
 
 data class UpdateTaskDto(
