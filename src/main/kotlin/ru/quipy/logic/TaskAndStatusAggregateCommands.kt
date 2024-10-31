@@ -3,7 +3,7 @@ package ru.quipy.logic
 import ru.quipy.api.*
 import java.util.*
 
-fun TaskAndStatusAggregateStatec.createTask(id: UUID, projectId: UUID, name: String, description: String, color: String): TaskCreatedEvent {
+fun TaskAndStatusAggregateState.createTask(id: UUID, projectId: UUID, name: String, description: String, color: String): TaskCreatedEvent {
     if (name.isEmpty()) {
         throw IllegalArgumentException("Task name should not be empty.")
     }
@@ -32,7 +32,7 @@ fun TaskAndStatusAggregateStatec.createTask(id: UUID, projectId: UUID, name: Str
 //    return TagAssignedToTaskEvent(projectId = this.getId(), tagId = tagId, taskId = taskId)
 //}
 
-fun TaskAndStatusAggregateStatec.updateTask(name: String, description: String): TaskUpdatedEvent {
+fun TaskAndStatusAggregateState.updateTask(name: String, description: String): TaskUpdatedEvent {
     if (name.isEmpty()) {
         throw IllegalArgumentException("Task name should not be empty.")
     }
@@ -40,7 +40,7 @@ fun TaskAndStatusAggregateStatec.updateTask(name: String, description: String): 
     return TaskUpdatedEvent(this.getId(), name, description)
 }
 
-fun TaskAndStatusAggregateStatec.addExecutor(userId: UUID): ExecutorAddedEvent {
+fun TaskAndStatusAggregateState.addExecutor(userId: UUID): ExecutorAddedEvent {
     if (executors.contains(userId)) {
         throw IllegalArgumentException("User is already assigned as an executor for this task.")
     }
@@ -48,14 +48,14 @@ fun TaskAndStatusAggregateStatec.addExecutor(userId: UUID): ExecutorAddedEvent {
     return ExecutorAddedEvent(this.getId(), userId)
 }
 
-fun TaskAndStatusAggregateStatec.assignStatus(statusId: UUID): StatusAssignedToTaskEvent {
+fun TaskAndStatusAggregateState.assignStatus(statusId: UUID): StatusAssignedToTaskEvent {
     return StatusAssignedToTaskEvent(this.getId(), statusId)
 }
 
-fun TaskAndStatusAggregateStatec.removeStatus(): StatusRemovedFromTaskEvent {
+fun TaskAndStatusAggregateState.removeStatus(): StatusRemovedFromTaskEvent {
     return StatusRemovedFromTaskEvent(this.getId())
 }
 
-fun TaskAndStatusAggregateStatec.changeStatus(statusId: UUID): TaskStatusChangedEvent {
+fun TaskAndStatusAggregateState.changeStatus(statusId: UUID): TaskStatusChangedEvent {
     return TaskStatusChangedEvent(this.getId(), statusId)
 }

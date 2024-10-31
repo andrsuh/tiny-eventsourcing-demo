@@ -9,7 +9,7 @@ import java.util.*
 @RestController
 @RequestMapping("/users")
 class UserController(
-        val usersEsService: EventSourcingService<UUID, UserAggregate, UserAggregateStatec>
+        val usersEsService: EventSourcingService<UUID, UserAggregate, UserAggregateState>
 ) {
 
     @PostMapping("")

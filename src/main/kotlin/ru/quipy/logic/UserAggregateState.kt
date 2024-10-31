@@ -6,7 +6,7 @@ import ru.quipy.core.annotations.StateTransitionFunc
 import ru.quipy.domain.AggregateState
 import java.util.*
 
-class UserAggregateStatec : AggregateState<UUID, UserAggregate> {
+class UserAggregateState : AggregateState<UUID, UserAggregate> {
     private lateinit var userId: UUID
     lateinit var nickname: String
     lateinit var password: String

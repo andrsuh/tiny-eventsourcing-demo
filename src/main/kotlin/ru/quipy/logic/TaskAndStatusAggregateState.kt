@@ -6,7 +6,7 @@ import ru.quipy.domain.AggregateState
 import java.awt.Color
 import java.util.*
 
-class TaskAndStatusAggregateStatec : AggregateState<UUID, TaskAndStatusAggregate> {
+class TaskAndStatusAggregateState : AggregateState<UUID, TaskAndStatusAggregate> {
     private lateinit var taskId: UUID
     var createdAt: Long = System.currentTimeMillis()
     var updatedAt: Long = System.currentTimeMillis()

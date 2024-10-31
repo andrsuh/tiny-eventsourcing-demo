@@ -9,7 +9,7 @@ import java.util.*
 @RestController
 @RequestMapping("/tasks")
 class TaskController(
-        val tasksEsService: EventSourcingService<UUID, TaskAndStatusAggregate, TaskAndStatusAggregateStatec>
+        val tasksEsService: EventSourcingService<UUID, TaskAndStatusAggregate, TaskAndStatusAggregateState>
 ) {
     @PostMapping("")
     fun createTask(@RequestBody body: CreateTaskDto): TaskCreatedEvent {
@@ -17,7 +17,7 @@ class TaskController(
     }
 
     @GetMapping("/{taskId}")
-    fun getTask(@PathVariable taskId: UUID): TaskAndStatusAggregateStatec? {
+    fun getTask(@PathVariable taskId: UUID): TaskAndStatusAggregateState? {
         return tasksEsService.getState(taskId)
     }
 
