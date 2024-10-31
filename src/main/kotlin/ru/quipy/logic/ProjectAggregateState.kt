@@ -250,6 +250,9 @@ class ProjectAggregateState : AggregateState<UUID, ProjectAggregate> {
     fun statusDeletedApply(event: StatusDeletedEvent) {
         val key = orderState.filter { x -> x.value.id.name.lowercase() == event.statusName.lowercase() }.keys.first()
         orderState.remove(key)
+
+        if (orderState.keys.size == 0) return
+
         val maxOrder = orderState.keys.maxOf { x -> x }
 
         var gapped = false
