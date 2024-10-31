@@ -1,16 +1,10 @@
 package ru.quipy.logic
 
-import ru.quipy.api.ProjectCreatedEvent
-import ru.quipy.api.TagAssignedToTaskEvent
-import ru.quipy.api.TagCreatedEvent
-import ru.quipy.api.TaskCreatedEvent
+import ru.quipy.api.*
 import java.util.*
 
 
-// Commands : takes something -> returns event
-// Here the commands are represented by extension functions, but also can be the class member functions
-
-fun ProjectAggregateState.create(id: UUID, title: String, creatorId: String): ProjectCreatedEvent {
+fun ProjectAggregateState.createProject(id: UUID, title: String, creatorId: String): ProjectCreatedEvent {
     return ProjectCreatedEvent(
         projectId = id,
         title = title,
@@ -18,25 +12,52 @@ fun ProjectAggregateState.create(id: UUID, title: String, creatorId: String): Pr
     )
 }
 
-fun ProjectAggregateState.addTask(name: String): TaskCreatedEvent {
-    return TaskCreatedEvent(projectId = this.getId(), taskId = UUID.randomUUID(), taskName = name)
-}
-
-fun ProjectAggregateState.createTag(name: String): TagCreatedEvent {
-    if (projectTags.values.any { it.name == name }) {
+fun ProjectAggregateState.createStatus(name: String, color: String, userInitiatorId: UUID): StatusCreatedEvent {
+    if (projectStatuses.values.any { it.name == name }) {
         throw IllegalArgumentException("Tag already exists: $name")
     }
-    return TagCreatedEvent(projectId = this.getId(), tagId = UUID.randomUUID(), tagName = name)
+    if (!users.contains(userInitiatorId)) {
+        error("You have no rights to create statuses in this project")
+    }
+    return StatusCreatedEvent(
+        projectId = this.getId(),
+        statusId = UUID.randomUUID(),
+        statusColor = color,
+        statusName = name
+    )
+}
+fun ProjectAggregateState.changeProjectName(name: String, userInitiatorId: UUID): ProjectNameChangedEvent {
+    if (this.name == name) {
+        error("This name already set")
+    }
+    if (!users.contains(userInitiatorId)){
+        error("You have no rights to change project name")
+    }
+    return ProjectNameChangedEvent(projectId = this.getId(), projectName = name)
+}
+fun ProjectAggregateState.addUserToProject(userInitiatorId: UUID, userId: UUID): UserAddedToProjectEvent {
+    if (!this.users.contains(userInitiatorId)) {
+        error("You have no rights to add users to this project")
+    }
+    if (this.users.contains(userId)) {
+        error("This user is already added to project")
+    }
+    return UserAddedToProjectEvent(projectId = this.getId(), userId = userId)
 }
 
-fun ProjectAggregateState.assignTagToTask(tagId: UUID, taskId: UUID): TagAssignedToTaskEvent {
-    if (!projectTags.containsKey(tagId)) {
-        throw IllegalArgumentException("Tag doesn't exists: $tagId")
+fun ProjectAggregateState.addTaskToProject(taskId: UUID): TaskAddedEvent {
+    if (this.tasks.contains(taskId)) {
+        error("Task was already added to project")
     }
+    return TaskAddedEvent(projectId = this.getId(), taskId = taskId)
+}
 
-    if (!tasks.containsKey(taskId)) {
-        throw IllegalArgumentException("Task doesn't exists: $taskId")
+fun ProjectAggregateState.deleteStatus(statusId: UUID, userInitiatorId: UUID): StatusDeletedEvent {
+    if (this.projectStatuses.containsKey(statusId)) {
+        error("Project doesn't contains this status")
     }
-
-    return TagAssignedToTaskEvent(projectId = this.getId(), tagId = tagId, taskId = taskId)
+    if (users.contains(userInitiatorId)){
+        error("You have no rights to delete status from this project")
+    }
+    return StatusDeletedEvent(projectId = this.getId(), statusId = statusId)
 }
