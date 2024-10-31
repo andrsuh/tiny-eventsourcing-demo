@@ -6,35 +6,50 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
-import ru.quipy.api.ProjectAggregate
-import ru.quipy.api.ProjectCreatedEvent
-import ru.quipy.api.TaskCreatedEvent
+import ru.quipy.api.*
 import ru.quipy.core.EventSourcingService
-import ru.quipy.logic.ProjectAggregateState
-import ru.quipy.logic.addTask
-import ru.quipy.logic.create
+import ru.quipy.logic.*
 import java.util.*
 
 @RestController
 @RequestMapping("/projects")
 class ProjectController(
-    val projectEsService: EventSourcingService<UUID, ProjectAggregate, ProjectAggregateState>
+    val projectEsService: EventSourcingService<UUID, ProjectAggregate, ProjectAggregateState>,
+    val projectAggregateCommands: ProjectAggregateCommands
 ) {
 
-    @PostMapping("/{projectTitle}")
+    @PostMapping("/create/{projectTitle}")
     fun createProject(@PathVariable projectTitle: String, @RequestParam creatorId: String) : ProjectCreatedEvent {
-        return projectEsService.create { it.create(UUID.randomUUID(), projectTitle, creatorId) }
+        return projectEsService.create { projectAggregateCommands.createProject(projectTitle, creatorId) }
     }
 
     @GetMapping("/{projectId}")
-    fun getAccount(@PathVariable projectId: UUID) : ProjectAggregateState? {
+    fun getProject(@PathVariable projectId: UUID) : ProjectAggregateState? {
         return projectEsService.getState(projectId)
     }
 
-    @PostMapping("/{projectId}/tasks/{taskName}")
-    fun createTask(@PathVariable projectId: UUID, @PathVariable taskName: String) : TaskCreatedEvent {
+
+
+    @PostMapping("/newMember/{projectId}")
+    fun addProjectMember(@PathVariable projectId: UUID, @RequestParam userId: UUID) : ProjectExecutorAddedEvent {
         return projectEsService.update(projectId) {
-            it.addTask(taskName)
+            projectAggregateCommands.addProjectMember(projectId, userId)
+        }
+    }
+
+    @PostMapping("/newStatus/{projectId}")
+    fun addStatus(@PathVariable projectId: UUID, @RequestParam nameStatus: String, @RequestParam color: String):
+            StatusCreatedEvent {
+        return projectEsService.update(projectId) {
+            projectAggregateCommands.addStatus(projectId, nameStatus, color)
+        }
+    }
+
+    @PostMapping("/deleteStatus/{projectId}")
+    fun addDefaultStatus(@PathVariable projectId: UUID, @RequestParam statusId: UUID):
+            StatusDeletedEvent {
+        return projectEsService.update(projectId) {
+            projectAggregateCommands.deleteStatus(projectId, statusId)
         }
     }
 }

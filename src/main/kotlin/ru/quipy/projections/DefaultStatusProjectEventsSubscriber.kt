@@ -8,7 +8,7 @@ import ru.quipy.api.*
 import ru.quipy.core.EventSourcingService
 import ru.quipy.logic.ProjectAggregateCommands
 import ru.quipy.logic.ProjectAggregateState
-import ru.quipy.logic.TaskAggregateState
+import ru.quipy.logic.ProjectAggregateState.Companion.defaultStatus
 import ru.quipy.streams.AggregateSubscriptionsManager
 import ru.quipy.streams.annotation.AggregateSubscriber
 import ru.quipy.streams.annotation.SubscribeEvent
@@ -17,32 +17,29 @@ import javax.annotation.PostConstruct
 
 @Service
 @AggregateSubscriber(
-    aggregateClass = TaskAggregate::class, subscriberName = "change-status-stream"
+    aggregateClass = ProjectAggregate::class, subscriberName = "default-status-stream"
 )
-class AnnotationBasedProjectEventsSubscriber (
+class DefaultStatusProjectEventsSubscriber (
     val projectEsService: EventSourcingService<UUID, ProjectAggregate, ProjectAggregateState>,
-    val taskEsService: EventSourcingService<UUID, TaskAggregate, TaskAggregateState>,
     val projectAggregateCommands: ProjectAggregateCommands,
 ){
 
     @Autowired
     private lateinit var subscriptionsManager: AggregateSubscriptionsManager
 
-    val logger: Logger = LoggerFactory.getLogger(AnnotationBasedProjectEventsSubscriber::class.java)
+    val logger: Logger = LoggerFactory.getLogger(DefaultStatusProjectEventsSubscriber::class.java)
 
     @PostConstruct
     fun init() {
-        subscriptionsManager.subscribe<TaskAggregate>(this)
+        subscriptionsManager.subscribe<ProjectAggregate>(this)
     }
 
     @SubscribeEvent
-    fun statusChangedSubscriber(event: StatusChangedEvent) {
-        val task = taskEsService.getState(event.taskId)!!
-        logger.info("Status changed: from {} to {} ",task.oldStatusId, event.statusId)
-        projectEsService.update(task.projectID) { _ ->
-            projectAggregateCommands.statusesCountChanged(task.oldStatusId, event.statusId)
+    fun addDefaultStatus(event: ProjectCreatedEvent) {
+        projectEsService.update(event.projectId) { _ ->
+            projectAggregateCommands.addStatus(projectId = event.projectId, statusName = defaultStatus.name,
+                color = defaultStatus.color, statusId = defaultStatus.id)
         }
-        logger.info("Status changed: {}", event.statusId)
     }
 
 }
