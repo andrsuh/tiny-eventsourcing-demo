@@ -131,6 +131,6 @@ class StatusDeletedEvent(
     val statusName: String,
     createdAt: Long = System.currentTimeMillis()
 ) : Event<ProjectAggregate>(
-    name = STATUS_COLOR_CHANGED_EVENT,
+    name = STATUS_DELETED_EVENT,
     createdAt = createdAt
 )
