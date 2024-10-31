@@ -1,8 +1,6 @@
-package ru.quipy.controller
+package ru.quipy.controller.auth
 
-import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
-import org.springframework.web.server.ResponseStatusException
 import ru.quipy.api.auth.UserAggregate
 import ru.quipy.api.auth.UserCreatedEvent
 import ru.quipy.core.EventSourcingService

@@ -23,6 +23,22 @@ class ProjectEventsSubscriber {
             `when`(ProjectCreatedEvent::class) { event ->
                 logger.info("Project created: {}", event.title)
             }
+
+            `when`(ParticipantAddedToProjectEvent::class) { event ->
+                logger.info("Participant {} added to project", event.participantId)
+            }
+
+            `when`(StatusCreatedEvent::class) { event ->
+                logger.info("Status created: {}", event.statusName)
+            }
+
+            `when`(TaskCreatedEvent::class) { event ->
+                logger.info("Task created: {}", event.taskName)
+            }
+
+            `when`(TaskAssigneeAddedEvent::class) { event ->
+                logger.info("Assignee {} added to task {}", event.participantId, event.taskId)
+            }
         }
     }
 }

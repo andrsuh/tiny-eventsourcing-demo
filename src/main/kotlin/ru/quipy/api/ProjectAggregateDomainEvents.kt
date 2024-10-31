@@ -5,6 +5,10 @@ import ru.quipy.domain.Event
 import java.util.*
 
 const val PROJECT_CREATED_EVENT = "PROJECT_CREATED_EVENT"
+const val PARTICIPANT_ADDED_TO_PROJECT_EVENT = "PARTICIPANT_ADDED_TO_PROJECT_EVENT"
+const val STATUS_CREATED_EVENT = "STATUS_CREATED_EVENT"
+const val TASK_CREATED_EVENT = "TASK_CREATED_EVENT"
+const val TASK_ASSIGNEE_ADDED_EVENT = "TASK_ASSIGNEE_ADDED_EVENT"
 
 @DomainEvent(name = PROJECT_CREATED_EVENT)
 class ProjectCreatedEvent(
@@ -15,4 +19,54 @@ class ProjectCreatedEvent(
 ) : Event<ProjectAggregate>(
     name = PROJECT_CREATED_EVENT,
     createdAt = createdAt,
+)
+
+@DomainEvent(name = PARTICIPANT_ADDED_TO_PROJECT_EVENT)
+class ParticipantAddedToProjectEvent(
+    val participantId: UUID,
+    createdAt: Long = System.currentTimeMillis(),
+) : Event<ProjectAggregate>(
+    name = PARTICIPANT_ADDED_TO_PROJECT_EVENT,
+    createdAt = createdAt,
+)
+
+@DomainEvent(name = STATUS_CREATED_EVENT)
+class StatusCreatedEvent(
+    val statusName: String,
+    val color: Color,
+    createdAt: Long = System.currentTimeMillis(),
+) : Event<ProjectAggregate>(
+    name = STATUS_CREATED_EVENT,
+    createdAt = createdAt
+)
+
+enum class Color {
+    RED,
+    GREEN,
+    BLUE,
+    PURPLE,
+    YELLOW,
+    GREY
+}
+
+@DomainEvent(name = TASK_CREATED_EVENT)
+class TaskCreatedEvent(
+    val taskId: UUID,
+    val taskName: String,
+    val description: String,
+    val statusName: String,
+    createdAt: Long = System.currentTimeMillis(),
+) : Event<ProjectAggregate>(
+    name = TASK_CREATED_EVENT,
+    createdAt = createdAt
+)
+
+@DomainEvent(name = TASK_ASSIGNEE_ADDED_EVENT)
+class TaskAssigneeAddedEvent(
+    val taskId: UUID,
+    val participantId: UUID,
+    createdAt: Long = System.currentTimeMillis(),
+) : Event<ProjectAggregate>(
+    name = TASK_ASSIGNEE_ADDED_EVENT,
+    createdAt = createdAt
 )
