@@ -5,30 +5,41 @@ import ru.quipy.api.auth.UserAggregate
 import ru.quipy.api.auth.UserCreatedEvent
 import ru.quipy.core.EventSourcingService
 import ru.quipy.logic.auth.UserAggregateState
+import ru.quipy.logic.auth.UserAggregateState.Companion.usersAggregateId
+import ru.quipy.logic.auth.UserEntity
 import java.util.*
 
 @RestController
 @RequestMapping("/users")
 class UserController(
-    val userEsService: EventSourcingService<UUID, UserAggregate, UserAggregateState>,
+    val userEsService: EventSourcingService<String, UserAggregate, UserAggregateState>,
 ) {
     @PostMapping("/create")
     fun createUser(
         @RequestBody dto: CreateUserDto,
     ): UserCreatedEvent {
-        return userEsService.create {
-            it.create(UUID.randomUUID(), dto.nickName, dto.name, dto.password)
+        if (userEsService.getState(usersAggregateId) == null) {
+            userEsService.create { it.create(usersAggregateId) }
+        }
+
+        return userEsService.update(usersAggregateId) {
+            it.createUser(UUID.randomUUID(), dto.nickName, dto.name, dto.password)
         }
     }
 
+    @GetMapping
+    fun getAllUsers() : UserAggregateState? {
+        return userEsService.getState(usersAggregateId)
+    }
+
     @GetMapping("/{userId}")
-    fun getUser(@PathVariable userId: UUID) : UserAggregateState? {
-        return userEsService.getState(userId)
+    fun getUser(@PathVariable userId: UUID) : UserEntity? {
+        return userEsService.getState(usersAggregateId)?.users?.get(userId)
     }
 }
 
 data class CreateUserDto(
     val nickName: String,
     val name: String,
-    val password: String,
+    val password: String
 )

@@ -59,7 +59,7 @@ class EventSourcingLibConfiguration {
     fun projectEsService() = eventSourcingServiceFactory.create<UUID, ProjectAggregate, ProjectAggregateState>()
 
     @Bean
-    fun userEsService() = eventSourcingServiceFactory.create<UUID, UserAggregate, UserAggregateState>()
+    fun userEsService() = eventSourcingServiceFactory.create<String, UserAggregate, UserAggregateState>()
 
     @PostConstruct
     fun init() {
