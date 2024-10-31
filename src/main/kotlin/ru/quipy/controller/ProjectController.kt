@@ -49,6 +49,48 @@ class ProjectController(
             it.addTaskAssignee(taskId, participantId)
         }
     }
+
+    @PostMapping("/change-task-status/{projectId}")
+    fun changeTaskStatus(@PathVariable projectId: UUID, @RequestParam taskId: UUID, @RequestParam newStatus: String, @RequestParam participantId: UUID) : TaskStatusChangedEvent {
+        return projectEsService.update(projectId) {
+            it.changeTaskStatus(taskId, newStatus, participantId)
+        }
+    }
+
+    @PostMapping("/change-task-name/{projectId}")
+    fun changeTaskName(@PathVariable projectId: UUID, @RequestParam taskId: UUID, @RequestParam newTaskName: String, @RequestParam participantId: UUID) : TaskNameChangedEvent {
+        return projectEsService.update(projectId) {
+            it.changeTaskName(taskId, newTaskName, participantId)
+        }
+    }
+
+    @DeleteMapping("/delete-task/{projectId}")
+    fun deleteTask(@PathVariable projectId: UUID, @RequestParam taskId: UUID, @RequestParam participantId: UUID) : TaskDeletedEvent {
+        return projectEsService.update(projectId) {
+            it.deleteTask(taskId, participantId)
+        }
+    }
+
+    @PostMapping("/change-task-name/{projectId}")
+    fun changeStatusOrder(@PathVariable projectId: UUID, @RequestParam statusName: String, @RequestParam newOrder: Int, @RequestParam participantId: UUID) : StatusOrderChangedEvent {
+        return projectEsService.update(projectId) {
+            it.changeStatusOrder(statusName, newOrder, participantId)
+        }
+    }
+
+    @PostMapping("/change-task-name/{projectId}")
+    fun changeStatusColor(@PathVariable projectId: UUID, @RequestParam statusName: String, @RequestParam newColor: Color, @RequestParam participantId: UUID) : StatusColorChangedEvent {
+        return projectEsService.update(projectId) {
+            it.changeStatusColor(statusName, newColor, participantId)
+        }
+    }
+
+    @DeleteMapping("/delete-task/{projectId}")
+    fun deleteStatus(@PathVariable projectId: UUID, @RequestParam statusName: String,  @RequestParam participantId: UUID) : StatusDeletedEvent {
+        return projectEsService.update(projectId) {
+            it.deleteStatus(statusName, participantId)
+        }
+    }
 }
 
 data class CreateTaskDto(

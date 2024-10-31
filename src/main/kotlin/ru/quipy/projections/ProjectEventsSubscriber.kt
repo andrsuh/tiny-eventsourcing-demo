@@ -5,7 +5,12 @@ import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import ru.quipy.api.*
+import ru.quipy.api.auth.UserAggregate
+import ru.quipy.core.EventSourcingService
+import ru.quipy.logic.ProjectAggregateState
+import ru.quipy.logic.auth.UserAggregateState
 import ru.quipy.streams.AggregateSubscriptionsManager
+import java.util.*
 import javax.annotation.PostConstruct
 
 @Service
@@ -15,6 +20,9 @@ class ProjectEventsSubscriber {
 
     @Autowired
     lateinit var subscriptionsManager: AggregateSubscriptionsManager
+
+    @Autowired
+    lateinit var userService: EventSourcingService<UUID, UserAggregate, UserAggregateState>
 
     @PostConstruct
     fun init() {

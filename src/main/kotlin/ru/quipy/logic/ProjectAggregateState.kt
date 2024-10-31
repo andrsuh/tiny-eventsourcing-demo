@@ -3,7 +3,9 @@ package ru.quipy.logic
 import ru.quipy.api.*
 import ru.quipy.core.annotations.StateTransitionFunc
 import ru.quipy.domain.AggregateState
+import java.lang.Integer.max
 import java.util.*
+import kotlin.math.min
 
 class ProjectAggregateState : AggregateState<UUID, ProjectAggregate> {
     private val defaultStatusName = "CREATED"
@@ -31,7 +33,7 @@ class ProjectAggregateState : AggregateState<UUID, ProjectAggregate> {
         )
     }
 
-    fun addParticipant(participantId: UUID) : ParticipantAddedToProjectEvent {
+    fun addParticipant(participantId: UUID): ParticipantAddedToProjectEvent {
         if (participants.contains(participantId)) {
             throw IllegalStateException("The user $participantId is already a member of the project $projectId")
         }
@@ -54,7 +56,7 @@ class ProjectAggregateState : AggregateState<UUID, ProjectAggregate> {
 
     fun createTask(id: UUID, name: String, description: String, participantId: UUID): TaskCreatedEvent {
         checkIfProjectParticipant(participantId)
-        val defaultStatus = orderState.values.find{ x -> x.id == StatusId(projectId, defaultStatusName)}
+        val defaultStatus = orderState.values.find { x -> x.id == StatusId(projectId, defaultStatusName) }
             ?: throw IllegalStateException("Default status $defaultStatusName not found")
 
         return TaskCreatedEvent(
@@ -76,6 +78,62 @@ class ProjectAggregateState : AggregateState<UUID, ProjectAggregate> {
         return TaskAssigneeAddedEvent(taskId, participantId)
     }
 
+    fun changeTaskName(taskId: UUID, newName: String, participantId: UUID): TaskNameChangedEvent {
+        checkIfProjectParticipant(participantId)
+        checkIfTaskExists(taskId)
+
+        return TaskNameChangedEvent(taskId, newName)
+    }
+
+    fun changeTaskStatus(taskId: UUID, statusName: String, participantId: UUID): TaskStatusChangedEvent {
+        checkIfProjectParticipant(participantId)
+        checkIfTaskExists(taskId)
+        checkIfStatusExists(statusName)
+
+        return TaskStatusChangedEvent(taskId, statusName)
+    }
+
+    fun deleteTask(taskId: UUID, participantId: UUID): TaskDeletedEvent{
+        checkIfProjectParticipant(participantId)
+        checkIfTaskExists(taskId)
+
+        return TaskDeletedEvent(taskId)
+    }
+
+    fun changeStatusOrder(statusName: String, newOrder: Int, participantId: UUID) : StatusOrderChangedEvent
+    {
+        checkIfProjectParticipant(participantId)
+        checkIfStatusesAreOrdered(statusName, newOrder)
+
+        return StatusOrderChangedEvent(statusName, newOrder)
+    }
+
+    fun changeStatusColor(statusName: String, newColor: Color, participantId: UUID) : StatusColorChangedEvent
+    {
+        checkIfProjectParticipant(participantId)
+        checkIfStatusExists(statusName)
+
+        return StatusColorChangedEvent(statusName, newColor)
+    }
+
+    fun deleteStatus(statusName: String, participantId: UUID) : StatusDeletedEvent {
+        checkIfProjectParticipant(participantId)
+
+        if (statusName.lowercase() == defaultStatusName.lowercase()) throw IllegalArgumentException("Cannot delete default status")
+        checkIfStatusExists(statusName)
+
+        return StatusDeletedEvent(statusName)
+    }
+
+    private fun checkIfStatusesAreOrdered(statusName: String, newOrder: Int)
+    {
+        val maxKey = orderState.keys.maxOf { x -> x }
+        val minKey = orderState.keys.minOf { x -> x }
+
+        if (newOrder > maxKey || newOrder < minKey)
+            throw IllegalStateException("New order of status $statusName cannot be larger than $maxKey or smaller than $minKey")
+    }
+
     private fun checkIfProjectParticipant(participantId: UUID) {
         if (!participants.contains(participantId)) {
             throw IllegalAccessException("User $participantId is not participant of the project $projectId")
@@ -87,6 +145,15 @@ class ProjectAggregateState : AggregateState<UUID, ProjectAggregate> {
             throw IllegalArgumentException("No such task: $taskId")
         }
     }
+
+
+    private fun checkIfStatusExists(statusName: String) {
+        if (orderState.values.any { x -> x.id.name.lowercase() == statusName.lowercase() }) {
+            throw IllegalArgumentException("No such status: $statusName")
+        }
+    }
+
+
 
     @StateTransitionFunc
     fun projectCreatedApply(event: ProjectCreatedEvent) {
@@ -128,23 +195,85 @@ class ProjectAggregateState : AggregateState<UUID, ProjectAggregate> {
         tasks[event.taskId]?.participantIds?.add(event.participantId)
         updatedAt = createdAt
     }
+
+    @StateTransitionFunc
+    fun taskNameChangedApply(event: TaskNameChangedEvent) {
+        tasks[event.taskId]?.name = event.newName
+    }
+
+    @StateTransitionFunc
+    fun taskStatusChangedApply(event: TaskStatusChangedEvent)
+    {
+        val status = orderState.values.first { x -> x.id.name.lowercase() == event.newStatusName.lowercase()}
+        tasks[event.taskId]?.status = status.id
+    }
+
+    @StateTransitionFunc
+    fun taskDeletedApply(event: TaskDeletedEvent)
+    {
+        tasks.remove(event.taskId)
+    }
+
+    @StateTransitionFunc
+    fun statusOrderChangedApply(event: StatusOrderChangedEvent)
+    {
+        val oldOrder = orderState.filter { x -> x.value.id.name.lowercase() == event.statusName.lowercase() }.keys.first()
+
+        if (oldOrder == event.newOrder) return
+
+        val replacedValue = orderState.remove(oldOrder)!!
+        val shiftRegion = orderState.keys.filter { x -> (x <= max(oldOrder, event.newOrder) && min(oldOrder, event.newOrder) <= x) }.sorted()
+
+        if (oldOrder < event.newOrder)
+        {
+            for (i in shiftRegion.lastIndex downTo 0 )
+            {
+                val value = orderState.remove(shiftRegion[i])!!
+                orderState[shiftRegion[i] + 1] = value
+            }
+        }
+
+        else {
+            for (i in shiftRegion)
+            {
+                val value = orderState.remove(shiftRegion[i])!!
+                orderState[shiftRegion[i] - 1] = value
+            }
+        }
+
+        orderState[event.newOrder] = replacedValue
+    }
+
+    @StateTransitionFunc
+    fun statusColorChangedApply(event: StatusColorChangedEvent)
+    {
+        val status = orderState.values.find { x -> x.id.name.lowercase() == event.statusName.lowercase()}!!
+
+        status.color = event.newColor
+    }
+
+    @StateTransitionFunc
+    fun statusDeletedApply(event: StatusDeletedEvent){
+        val key = orderState.filter { x -> x.value.id.name.lowercase() == event.statusName.lowercase()}.keys.first()
+        orderState.remove(key)
+    }
 }
 
 
 data class StatusId(
     val projectId: UUID,
-    val name: String
+    var name: String
 )
 
 data class StatusEntity(
     val id: StatusId,
-    val color: Color
+    var color: Color
 )
 
 data class TaskEntity(
     val id: UUID = UUID.randomUUID(),
-    val name: String,
+    var name: String,
     val description: String,
-    val status: StatusId,
+    var status: StatusId,
     val participantIds: MutableList<UUID> = mutableListOf()
 )
