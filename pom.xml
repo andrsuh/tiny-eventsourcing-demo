@@ -52,17 +52,17 @@
 			<version>${tiny.es.version}</version>
 		</dependency>
 
-		<dependency>
-			<groupId>ru.quipy</groupId>
-			<artifactId>tiny-postgres-event-store-spring-boot-starter</artifactId>
-			<version>${tiny.es.version}</version>
-		</dependency>
-
 <!--		<dependency>-->
 <!--			<groupId>ru.quipy</groupId>-->
-<!--			<artifactId>tiny-mongo-event-store-spring-boot-starter</artifactId>-->
+<!--			<artifactId>tiny-postgres-event-store-spring-boot-starter</artifactId>-->
 <!--			<version>${tiny.es.version}</version>-->
 <!--		</dependency>-->
+
+		<dependency>
+			<groupId>ru.quipy</groupId>
+			<artifactId>tiny-mongo-event-store-spring-boot-starter</artifactId>
+			<version>${tiny.es.version}</version>
+		</dependency>
 	</dependencies>
 
 	<build>
