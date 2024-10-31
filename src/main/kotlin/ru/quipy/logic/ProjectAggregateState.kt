@@ -10,6 +10,7 @@ import kotlin.math.min
 class ProjectAggregateState : AggregateState<UUID, ProjectAggregate> {
     private val defaultStatusName = "CREATED"
     private val defaultStatusColor = Color.GREEN
+    private val firstStatusOrder = 1;
 
     private lateinit var projectId: UUID
     var createdAt: Long = System.currentTimeMillis()
@@ -161,7 +162,7 @@ class ProjectAggregateState : AggregateState<UUID, ProjectAggregate> {
         projectTitle = event.title
         creatorId = event.creatorId
         participants.add(event.creatorId)
-        orderState[1] = StatusEntity(StatusId(event.projectId, defaultStatusName), defaultStatusColor)
+        orderState[firstStatusOrder] = StatusEntity(StatusId(event.projectId, defaultStatusName), defaultStatusColor)
         updatedAt = createdAt
     }
 
@@ -248,7 +249,6 @@ class ProjectAggregateState : AggregateState<UUID, ProjectAggregate> {
     fun statusColorChangedApply(event: StatusColorChangedEvent)
     {
         val status = orderState.values.find { x -> x.id.name.lowercase() == event.statusName.lowercase()}!!
-
         status.color = event.newColor
     }
 
@@ -256,6 +256,22 @@ class ProjectAggregateState : AggregateState<UUID, ProjectAggregate> {
     fun statusDeletedApply(event: StatusDeletedEvent){
         val key = orderState.filter { x -> x.value.id.name.lowercase() == event.statusName.lowercase()}.keys.first()
         orderState.remove(key)
+        val maxOrder = orderState.keys.maxOf { x -> x }
+
+        var gapped = false
+        for (i in firstStatusOrder..maxOrder)
+        {
+            if (!orderState.containsKey(i)) {
+                gapped = true
+                continue
+            }
+
+            if (gapped)
+            {
+                val value = orderState.remove(i)!!
+                orderState[i - 1] = value
+            }
+        }
     }
 }
 
