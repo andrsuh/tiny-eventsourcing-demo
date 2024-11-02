@@ -1,74 +1,65 @@
 package ru.quipy.controller
 
-//import org.springframework.web.bind.annotation.*
-//import ru.quipy.api.ProjectAggregate
-//import ru.quipy.api.ProjectCreatedEvent
-//import ru.quipy.api.TaskAndStatusAggregate
-//import ru.quipy.api.TaskCreatedEvent
-//import ru.quipy.core.EventSourcingService
-//import ru.quipy.logic.ProjectAggregateState
-//import ru.quipy.logic.addTask
-//import ru.quipy.logic.create
-//import java.util.*
 import org.springframework.web.bind.annotation.*
 import ru.quipy.api.*
 import ru.quipy.core.EventSourcingService
+import ru.quipy.dto.project.AddParticipantDto
+import ru.quipy.dto.project.CreateProjectDto
+import ru.quipy.enum.ColorEnum
 import ru.quipy.logic.*
+import ru.quipy.logic.command.addParticipantById
+import ru.quipy.logic.command.createProject
+import ru.quipy.logic.state.ProjectAggregateState
+import ru.quipy.logic.state.TaskAndStatusAggregateState
+import ru.quipy.logic.state.UserAggregateState
 import java.util.*
 
 @RestController
 @RequestMapping("/projects")
 class ProjectController(
         val projectEsService: EventSourcingService<UUID, ProjectAggregate, ProjectAggregateState>,
-    val tasksEsService: EventSourcingService<UUID, TaskAndStatusAggregate, TaskAndStatusAggregateState>
+        val taskEsService: EventSourcingService<UUID, TaskAndStatusAggregate, TaskAndStatusAggregateState>,
+        val userEsService: EventSourcingService<UUID, UserAggregate, UserAggregateState>
 ) {
 
     @PostMapping("")
-    fun createProject(@RequestBody body: CreateProjectDto) : ProjectCreatedEvent {
-        return projectEsService.create { it.createProject(UUID.randomUUID(), body.projectName, body.creatorId) }
+    fun createProject(@RequestBody body: CreateProjectDto): ProjectCreatedEvent {
+        val user = userEsService.getState(body.creatorId)
+                ?: throw NullPointerException("User ${body.creatorId} does not found")
+
+        val response =  projectEsService.create { it.createProject(UUID.randomUUID(), UUID.randomUUID(), body.projectName, body.creatorId) }
+
+        taskEsService.create {
+            it.createStatus(UUID.randomUUID(), "CREATED", response.projectId, ColorEnum.GREEN)
+        }
+
+        projectEsService.update(response.projectId) {
+            it.addParticipantById(userId = body.creatorId)
+        }
+
+        return response;
     }
 
     @GetMapping("/{projectId}")
-    fun getProject(@PathVariable projectId: UUID) : ProjectAggregateState? {
+    fun getProject(@PathVariable projectId: UUID): ProjectAggregateState? {
         return projectEsService.getState(projectId)
     }
 
-    @PatchMapping("/{projectId}")
-    fun updateTask(@PathVariable projectId: UUID, @RequestBody body: UpdateProjectDto): ProjectUpdatedEvent {
-        return projectEsService.update(projectId) { it.updateProject(projectId, body.name) }
-    }
-
     @PostMapping("/{projectId}/participants")
-    fun addParticipant(@PathVariable projectId: UUID, @RequestBody body: AddParticipantDto) : ParticipantAddedEvent {
+    fun addParticipant(@PathVariable projectId: UUID, @RequestBody body: AddParticipantDto): ParticipantAddedEvent {
+        val user = userEsService.getState(body.userId)
+                ?: throw NullPointerException("User ${body.userId} does not found")
+
         return projectEsService.update(projectId) { it.addParticipantById(userId = body.userId) }
     }
 
-    @PostMapping("/{projectId}/statuses")
-    fun createStatus(@PathVariable projectId: UUID, @RequestBody body: CreateStatusDto) : StatusCreatedEvent {
-        return projectEsService.update(projectId) { it.createStatus(UUID.randomUUID(), body.statusName, body.color) }
-    }
-
-    @DeleteMapping("/{projectId}/statuses/{statusId}")
-    fun deleteStatus(@PathVariable projectId: UUID, @PathVariable statusId:UUID) : StatusDeletedEvent{
-        return projectEsService.update(projectId) { it.deleteStatus(statusId) }
-    }
-
+    //    @PatchMapping("/{projectId}")
+//    fun updateProject(@PathVariable projectId: UUID, @RequestBody body: UpdateProjectDto): ProjectUpdatedEvent {
+//        return projectEsService.update(projectId) { it.updateProject(projectId, body.name) }
+//    }
 }
 
-data class CreateProjectDto (
-        val projectName: String,
-        val creatorId: UUID
-)
 
-data class UpdateProjectDto(
-        val name: String
-)
-
-data class AddParticipantDto (
-        val userId: UUID
-)
-
-data class CreateStatusDto (
-        val statusName: String,
-        val color: String
-)
+//data class UpdateProjectDto(
+//        val name: String
+//)

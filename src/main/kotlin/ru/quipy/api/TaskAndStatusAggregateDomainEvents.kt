@@ -43,15 +43,6 @@ class ExecutorAddedEvent(
         name = EXECUTOR_ADDED_EVENT,
         createdAt = createdAt
 )
-@DomainEvent(name = STATUS_ASSIGNED_TO_TASK_EVENT)
-class StatusAssignedToTaskEvent(
-        val taskId: UUID,
-        val statusId: UUID,
-        createdAt: Long = System.currentTimeMillis(),
-) : Event<TaskAndStatusAggregate>(
-        name = STATUS_ASSIGNED_TO_TASK_EVENT,
-        createdAt = createdAt
-)
 
 @DomainEvent(name = TASK_STATUS_CHANGED_EVENT)
 class TaskStatusChangedEvent(
@@ -62,11 +53,28 @@ class TaskStatusChangedEvent(
         name = TASK_STATUS_CHANGED_EVENT,
         createdAt = createdAt
 )
-@DomainEvent(name = STATUS_REMOVED_FROM_TASK_EVENT)
-class StatusRemovedFromTaskEvent(
-        val taskId: UUID,
+
+@DomainEvent(name = STATUS_CREATED_EVENT)
+class StatusCreatedEvent(
+        val projectId: UUID,
+        val statusId: UUID,
+        val statusName: String,
+        val color: String,
         createdAt: Long = System.currentTimeMillis(),
-) : Event<TaskAndStatusAggregate>(
-        name = STATUS_REMOVED_FROM_TASK_EVENT,
+) : Event<ProjectAggregate>(
+        name = STATUS_CREATED_EVENT,
+        createdAt = createdAt,
+)
+
+
+//color = if (Color.getColor(event.color) != null) Color.getColor(event.color) else throw IllegalArgumentException("Incorrect color type.")
+
+@DomainEvent(name = STATUS_DELETED_EVENT)
+class StatusDeletedEvent(
+        val projectId: UUID,
+        val statusId: UUID,
+        createdAt: Long = System.currentTimeMillis(),
+) : Event<ProjectAggregate>(
+        name = STATUS_DELETED_EVENT,
         createdAt = createdAt
 )

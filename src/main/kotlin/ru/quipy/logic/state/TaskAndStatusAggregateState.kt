@@ -1,4 +1,4 @@
-package ru.quipy.logic
+package ru.quipy.logic.state
 
 import ru.quipy.api.*
 import ru.quipy.core.annotations.StateTransitionFunc
@@ -41,11 +41,6 @@ class TaskAndStatusAggregateState : AggregateState<UUID, TaskAndStatusAggregate>
         updatedAt = event.createdAt
     }
 
-    @StateTransitionFunc
-    fun statusAssignedApply(event: StatusAssignedToTaskEvent) {
-        statusId = event.statusId
-        updatedAt = event.createdAt
-    }
 
     @StateTransitionFunc
     fun statusChangedApply(event: TaskStatusChangedEvent) {
@@ -53,9 +48,15 @@ class TaskAndStatusAggregateState : AggregateState<UUID, TaskAndStatusAggregate>
         updatedAt = event.createdAt
     }
 
+
     @StateTransitionFunc
-    fun statusRemovedApply(event: StatusRemovedFromTaskEvent) {
-        statusId = null
+    fun statusCreatedApply(event: StatusCreatedEvent) {
+        projectStatuses[event.statusId] = StatusEntity(id=event.statusId, name = event.statusName, color = event.color)
+        updatedAt = event.createdAt
+    }
+    @StateTransitionFunc
+    fun statusDeletedApply(event: StatusDeletedEvent) {
+        projectStatuses.remove(event.statusId)
         updatedAt = event.createdAt
     }
 }

@@ -1,6 +1,8 @@
-package ru.quipy.logic
+package ru.quipy.logic.command
 
 import ru.quipy.api.*
+import ru.quipy.logic.state.ProjectAggregateState
+import ru.quipy.logic.state.TaskAndStatusAggregateState
 import java.util.*
 
 fun TaskAndStatusAggregateState.createTask(id: UUID, projectId: UUID, name: String, description: String): TaskCreatedEvent {
@@ -48,14 +50,31 @@ fun TaskAndStatusAggregateState.addExecutor(userId: UUID): ExecutorAddedEvent {
     return ExecutorAddedEvent(this.getId(), userId)
 }
 
-fun TaskAndStatusAggregateState.assignStatus(statusId: UUID): StatusAssignedToTaskEvent {
-    return StatusAssignedToTaskEvent(this.getId(), statusId)
-}
-
-fun TaskAndStatusAggregateState.removeStatus(): StatusRemovedFromTaskEvent {
-    return StatusRemovedFromTaskEvent(this.getId())
-}
 
 fun TaskAndStatusAggregateState.changeStatus(statusId: UUID): TaskStatusChangedEvent {
     return TaskStatusChangedEvent(this.getId(), statusId)
+}
+
+fun ProjectAggregateState.createStatus(statusId: UUID, statusName: String, color: String): StatusCreatedEvent {
+    if (statusName.length > 255) {
+        throw IllegalArgumentException("Status name should be less than 255 characters!")
+    }
+
+    if (projectStatuses.size == 50) {
+        throw IllegalArgumentException("Maximum number of statuses reached for the project.")
+    }
+
+    return StatusCreatedEvent(projectId = this.getId(), statusId = statusId, statusName = statusName, color = color)
+}
+
+fun ProjectAggregateState.deleteStatus(statusId: UUID): StatusDeletedEvent {
+    if (!projectStatuses.contains(statusId)) {
+        throw IllegalArgumentException("Status not found!")
+    }
+
+    if (projectStatuses.size == 1) {
+        throw IllegalArgumentException("Cannot delete the only status in the project.")
+    }
+
+    return StatusDeletedEvent(projectId = this.getId(), statusId = statusId)
 }

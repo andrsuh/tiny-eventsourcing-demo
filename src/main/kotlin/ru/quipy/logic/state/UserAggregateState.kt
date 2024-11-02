@@ -1,4 +1,4 @@
-package ru.quipy.logic
+package ru.quipy.logic.state
 
 import ru.quipy.api.UserAggregate
 import ru.quipy.api.UserCreatedEvent
@@ -12,7 +12,14 @@ class UserAggregateState : AggregateState<UUID, UserAggregate> {
     lateinit var password: String
     lateinit var uname: String
 
+    var createdAt: Long = System.currentTimeMillis()
+    var updatedAt: Long = System.currentTimeMillis()
+
     override fun getId() = userId
+
+    fun getNickname() = nickname
+    fun getPassword() = password
+    fun getName() = uname
 
     @StateTransitionFunc
     fun userCreatedApply(event: UserCreatedEvent) {
@@ -20,5 +27,6 @@ class UserAggregateState : AggregateState<UUID, UserAggregate> {
         uname = event.uname
         nickname = event.nickname
         password = event.password
+        updatedAt = createdAt
     }
 }
