@@ -8,9 +8,9 @@ import java.util.*
 
 class UserAggregateState : AggregateState<UUID, UserAggregate> {
     private lateinit var userId: UUID
-    lateinit var nickname: String
-    lateinit var password: String
-    lateinit var uname: String
+    private lateinit var nickname: String
+    private lateinit var password: String
+    private lateinit var uname: String
 
     var createdAt: Long = System.currentTimeMillis()
     var updatedAt: Long = System.currentTimeMillis()

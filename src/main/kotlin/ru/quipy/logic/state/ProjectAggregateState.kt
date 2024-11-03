@@ -1,21 +1,22 @@
 package ru.quipy.logic.state
 
-import ru.quipy.api.*
+import ru.quipy.api.ParticipantAddedEvent
+import ru.quipy.api.ProjectAggregate
+import ru.quipy.api.ProjectCreatedEvent
 import ru.quipy.core.annotations.StateTransitionFunc
 import ru.quipy.domain.AggregateState
-import java.util.*
+import java.util.UUID
 
 
 class ProjectAggregateState : AggregateState<UUID, ProjectAggregate> {
     private lateinit var projectId: UUID
     private lateinit var taskAndStatusAggregateId: UUID
     private lateinit var name: String
+    private var participants = mutableListOf<UUID>()
 
 
     var createdAt: Long = System.currentTimeMillis()
     var updatedAt: Long = System.currentTimeMillis()
-
-    val participants = mutableListOf<UUID>()
 
     override fun getId() = projectId
     fun getTaskAndStatusAggregateId() = taskAndStatusAggregateId

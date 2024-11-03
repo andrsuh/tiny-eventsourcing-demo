@@ -15,7 +15,7 @@ fun ProjectAggregateState.createProject(
 }
 
 fun ProjectAggregateState.addParticipantById(userId: UUID): ParticipantAddedEvent {
-    if (participants.contains(userId))
+    if (getParticipants().contains(userId))
         throw IllegalArgumentException("User $userId is already a participant of the project ${getId()}.")
 
     return ParticipantAddedEvent(projectId = getId(), userId = userId)
