@@ -3,7 +3,6 @@ package ru.quipy.logic.state
 import ru.quipy.api.*
 import ru.quipy.core.annotations.StateTransitionFunc
 import ru.quipy.domain.AggregateState
-import ru.quipy.entity.StatusEntity
 import java.util.*
 
 
@@ -21,7 +20,7 @@ class ProjectAggregateState : AggregateState<UUID, ProjectAggregate> {
     override fun getId() = projectId
     fun getTaskAndStatusAggregateId() = taskAndStatusAggregateId
 
-    fun getParticipants(id: UUID) = participants
+    fun getParticipants() = participants
 
     fun getParticipantById(id: UUID) = participants.firstOrNull() { it == id }
 
@@ -36,9 +35,6 @@ class ProjectAggregateState : AggregateState<UUID, ProjectAggregate> {
 
     @StateTransitionFunc
     fun participantAddedApply(event: ParticipantAddedEvent) {
-        if (participants.contains(event.userId))
-            throw IllegalArgumentException("User ${event.userId} is already a participant of the project ${event.projectId}.")
-
         participants.add(element = event.userId)
         updatedAt = event.createdAt
     }

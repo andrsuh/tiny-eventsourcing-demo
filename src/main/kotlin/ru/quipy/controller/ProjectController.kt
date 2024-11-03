@@ -7,6 +7,7 @@ import ru.quipy.enum.ColorEnum
 import ru.quipy.logic.*
 import ru.quipy.logic.command.addParticipantById
 import ru.quipy.logic.command.createProject
+import ru.quipy.logic.command.createStatus
 import ru.quipy.logic.state.ProjectAggregateState
 import ru.quipy.logic.state.TaskAndStatusAggregateState
 import ru.quipy.logic.state.UserAggregateState

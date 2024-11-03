@@ -3,10 +3,6 @@ package ru.quipy.controller
 import org.springframework.web.bind.annotation.*
 import ru.quipy.api.*
 import ru.quipy.core.EventSourcingService
-import ru.quipy.dto.taskandstatus.AddExecutorDto
-import ru.quipy.dto.taskandstatus.CreateStatusDto
-import ru.quipy.dto.taskandstatus.CreateTaskDto
-import ru.quipy.dto.taskandstatus.UpdateTaskDto
 import ru.quipy.entity.StatusEntity
 import ru.quipy.entity.TaskEntity
 import ru.quipy.enum.ColorEnum
@@ -90,7 +86,7 @@ class TaskController(
         if (tasksEsService.getState(project.getId()) == null)
             throw NullPointerException("Tasks and statuses aggregate $projectId does not exist.")
 
-        return projectEsService.update(projectId) {
+        return tasksEsService.update(projectId) {
             it.createStatus(
                     UUID.randomUUID(),
                     statusName,
@@ -122,7 +118,7 @@ class TaskController(
         val project = projectEsService.getState(projectId)
                 ?: throw NullPointerException("Project $projectId was not found.")
 
-        return projectEsService.update(project.getId()) { it.deleteStatus(statusId) }
+        return tasksEsService.update(project.getId()) { it.deleteStatus(statusId) }
     }
 
     @PatchMapping("/project/{projectId}/status/{statusId}/position")
