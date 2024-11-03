@@ -30,19 +30,12 @@ class ProjectAggregateState : AggregateState<UUID, ProjectAggregate> {
     @StateTransitionFunc
     fun projectCreatedApply(event: ProjectCreatedEvent) {
         projectId = event.projectId
-        taskAndStatusAggregateId = event.tasksAndStatusAggregateId
         name = event.projectName
         updatedAt = createdAt
     }
 
-//    @StateTransitionFunc
-//    fun projectUpdatedApply(event: ProjectUpdatedEvent) {
-//        name = event.projectName
-//        updatedAt = createdAt
-//    }
-
     @StateTransitionFunc
-    fun participantAddApply(event: ParticipantAddedEvent) {
+    fun participantAddedApply(event: ParticipantAddedEvent) {
         if (participants.contains(event.userId))
             throw IllegalArgumentException("User ${event.userId} is already a participant of the project ${event.projectId}.")
 

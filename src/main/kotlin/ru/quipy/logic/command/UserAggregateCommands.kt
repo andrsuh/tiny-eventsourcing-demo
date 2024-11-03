@@ -4,11 +4,11 @@ import ru.quipy.api.UserCreatedEvent
 import ru.quipy.logic.state.UserAggregateState
 import java.util.*
 
-fun UserAggregateState.createUser(id: UUID, userName: String, nickname: String, password: String): UserCreatedEvent {
+fun UserAggregateState.createUser(id: UUID, nickname: String, password: String, uname: String): UserCreatedEvent {
     return UserCreatedEvent(
             userId = id,
-            uname = uname,
             nickname = nickname,
-            password = password
+            password = password,
+            uname = uname
     )
 }

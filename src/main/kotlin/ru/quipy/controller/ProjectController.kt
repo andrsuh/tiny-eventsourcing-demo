@@ -3,8 +3,6 @@ package ru.quipy.controller
 import org.springframework.web.bind.annotation.*
 import ru.quipy.api.*
 import ru.quipy.core.EventSourcingService
-import ru.quipy.dto.project.AddParticipantDto
-import ru.quipy.dto.project.CreateProjectDto
 import ru.quipy.enum.ColorEnum
 import ru.quipy.logic.*
 import ru.quipy.logic.command.addParticipantById
@@ -23,18 +21,21 @@ class ProjectController(
 ) {
 
     @PostMapping("")
-    fun createProject(@RequestBody body: CreateProjectDto): ProjectCreatedEvent {
-        val user = userEsService.getState(body.creatorId)
-                ?: throw NullPointerException("User ${body.creatorId} does not found")
+    fun createProject(
+            @RequestParam projectName: String,
+            @RequestParam creatorId: UUID,
+    ): ProjectCreatedEvent {
+        val user = userEsService.getState(creatorId)
+                ?: throw NullPointerException("User $creatorId does not found")
 
-        val response =  projectEsService.create { it.createProject(UUID.randomUUID(), UUID.randomUUID(), body.projectName, body.creatorId) }
+        val response = projectEsService.create { it.createProject(UUID.randomUUID(), projectName) }
 
         taskEsService.create {
             it.createStatus(UUID.randomUUID(), "CREATED", response.projectId, ColorEnum.GREEN)
         }
 
         projectEsService.update(response.projectId) {
-            it.addParticipantById(userId = body.creatorId)
+            it.addParticipantById(userId = creatorId)
         }
 
         return response;
@@ -46,20 +47,12 @@ class ProjectController(
     }
 
     @PostMapping("/{projectId}/participants")
-    fun addParticipant(@PathVariable projectId: UUID, @RequestBody body: AddParticipantDto): ParticipantAddedEvent {
-        val user = userEsService.getState(body.userId)
-                ?: throw NullPointerException("User ${body.userId} does not found")
+    fun addParticipant(
+            @PathVariable projectId: UUID,
+            @RequestParam userId: UUID
+    ): ParticipantAddedEvent {
+        val user = userEsService.getState(userId) ?: throw NullPointerException("User $userId wasn't not found.")
 
-        return projectEsService.update(projectId) { it.addParticipantById(userId = body.userId) }
+        return projectEsService.update(projectId) { it.addParticipantById(userId = userId) }
     }
-
-    //    @PatchMapping("/{projectId}")
-//    fun updateProject(@PathVariable projectId: UUID, @RequestBody body: UpdateProjectDto): ProjectUpdatedEvent {
-//        return projectEsService.update(projectId) { it.updateProject(projectId, body.name) }
-//    }
 }
-
-
-//data class UpdateProjectDto(
-//        val name: String
-//)

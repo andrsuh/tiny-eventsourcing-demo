@@ -2,14 +2,16 @@ package ru.quipy.api
 
 import ru.quipy.core.annotations.DomainEvent
 import ru.quipy.domain.Event
+import ru.quipy.enum.ColorEnum
 import java.util.*
 
 const val TASK_CREATED_EVENT = "TASK_CREATED_EVENT"
 const val TASK_UPDATED_EVENT = "TASK_UPDATED_EVENT"
 const val EXECUTOR_ADDED_EVENT = "EXECUTOR_ADDED_EVENT"
-const val STATUS_ASSIGNED_TO_TASK_EVENT = "STATUS_ASSIGNED_TO_TASK_EVENT"
-const val STATUS_REMOVED_FROM_TASK_EVENT = "STATUS_REMOVED_FROM_TASK_EVENT"
+const val STATUS_CREATED_EVENT = "STATUS_CREATED_EVENT"
+const val STATUS_DELETED_EVENT = "STATUS_DELETED_EVENT"
 const val TASK_STATUS_CHANGED_EVENT = "TASK_STATUS_CHANGED_EVENT"
+const val TASK_STATUS_POSITION_CHANGED_EVENT = "TASK_STATUS_POSITION_CHANGED_EVENT"
 // API
 
 @DomainEvent(name = TASK_CREATED_EVENT)
@@ -18,6 +20,8 @@ class TaskCreatedEvent(
         val projectId: UUID,
         val taskName: String,
         val description: String,
+        val statusId: UUID,
+        val assignees: MutableList<UUID> = mutableListOf(),
         createdAt: Long = System.currentTimeMillis(),
 ) : Event<TaskAndStatusAggregate>(
         name = TASK_CREATED_EVENT,
@@ -56,25 +60,31 @@ class TaskStatusChangedEvent(
 
 @DomainEvent(name = STATUS_CREATED_EVENT)
 class StatusCreatedEvent(
-        val projectId: UUID,
         val statusId: UUID,
         val statusName: String,
-        val color: String,
+        val projectId: UUID,
+        val color: ColorEnum,
         createdAt: Long = System.currentTimeMillis(),
 ) : Event<ProjectAggregate>(
         name = STATUS_CREATED_EVENT,
         createdAt = createdAt,
 )
 
-
-//color = if (Color.getColor(event.color) != null) Color.getColor(event.color) else throw IllegalArgumentException("Incorrect color type.")
-
 @DomainEvent(name = STATUS_DELETED_EVENT)
 class StatusDeletedEvent(
-        val projectId: UUID,
         val statusId: UUID,
         createdAt: Long = System.currentTimeMillis(),
 ) : Event<ProjectAggregate>(
         name = STATUS_DELETED_EVENT,
         createdAt = createdAt
+)
+
+@DomainEvent(name = TASK_STATUS_POSITION_CHANGED_EVENT)
+class StatusPositionChangedEvent(
+        val statusId: UUID,
+        val position: Int,
+        createdAt: Long = System.currentTimeMillis(),
+) : Event<TaskAndStatusAggregate>(
+        name = TASK_STATUS_POSITION_CHANGED_EVENT,
+        createdAt = createdAt,
 )

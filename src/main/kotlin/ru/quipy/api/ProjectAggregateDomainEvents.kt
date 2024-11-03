@@ -6,34 +6,19 @@ import java.util.*
 
 
 const val PROJECT_CREATED_EVENT = "PROJECT_CREATED_EVENT"
-const val PROJECT_UPDATED_EVENT = "PROJECT_UPDATED_EVENT"
 const val PARTICIPANT_ADDED_EVENT = "PARTICIPANT_ADDED_EVENT"
-const val LEAVE_PROJECT_EVENT = "LEAVE_PROJECT_EVENT"
-const val STATUS_CREATED_EVENT = "STATUS_CREATED_EVENT"
-const val STATUS_DELETED_EVENT = "STATUS_DELETED_EVENT"
 
 
 // API
 @DomainEvent(name = PROJECT_CREATED_EVENT)
 class ProjectCreatedEvent(
         val projectId: UUID,
-        var tasksAndStatusAggregateId: UUID,
-        val projectName: String
+        val projectName: String,
         createdAt: Long = System.currentTimeMillis(),
 ) : Event<ProjectAggregate>(
         name = PROJECT_CREATED_EVENT,
         createdAt = createdAt,
 )
-
-//@DomainEvent(name = PROJECT_UPDATED_EVENT)
-//class ProjectUpdatedEvent(
-//        val projectId: UUID,
-//        val projectName: String,
-//        createdAt: Long = System.currentTimeMillis(),
-//) : Event<ProjectAggregate>(
-//        name = PROJECT_UPDATED_EVENT,
-//        createdAt = createdAt,
-//)
 
 @DomainEvent(name = PARTICIPANT_ADDED_EVENT)
 class ParticipantAddedEvent(

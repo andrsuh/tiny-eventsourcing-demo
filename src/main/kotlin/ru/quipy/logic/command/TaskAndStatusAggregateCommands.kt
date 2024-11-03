@@ -1,11 +1,12 @@
 package ru.quipy.logic.command
 
 import ru.quipy.api.*
+import ru.quipy.enum.ColorEnum
 import ru.quipy.logic.state.ProjectAggregateState
 import ru.quipy.logic.state.TaskAndStatusAggregateState
 import java.util.*
 
-fun TaskAndStatusAggregateState.createTask(id: UUID, projectId: UUID, name: String, description: String): TaskCreatedEvent {
+fun TaskAndStatusAggregateState.createTask(id: UUID, name: String, description: String, projectId: UUID, statusId: UUID): TaskCreatedEvent {
     if (name.isEmpty()) {
         throw IllegalArgumentException("Task name should not be empty.")
     }
@@ -13,28 +14,10 @@ fun TaskAndStatusAggregateState.createTask(id: UUID, projectId: UUID, name: Stri
 //        throw IllegalArgumentException("Task name already exists: $name")
 //    }
 
-    return TaskCreatedEvent(id, projectId, name, description)
+    return TaskCreatedEvent(id, projectId, name, description, statusId)
 }
-//fun ProjectAggregateState.createTag(name: String): TagCreatedEvent {
-//    if (projectTags.values.any { it.name == name }) {
-//        throw IllegalArgumentException("Tag already exists: $name")
-//    }
-//    return TagCreatedEvent(projectId = this.getId(), tagId = UUID.randomUUID(), tagName = name)
-//}
-//
-//fun ProjectAggregateState.assignTagToTask(tagId: UUID, taskId: UUID): TagAssignedToTaskEvent {
-//    if (!projectTags.containsKey(tagId)) {
-//        throw IllegalArgumentException("Tag doesn't exists: $tagId")
-//    }
-//
-//    if (!tasks.containsKey(taskId)) {
-//        throw IllegalArgumentException("Task doesn't exists: $taskId")
-//    }
-//
-//    return TagAssignedToTaskEvent(projectId = this.getId(), tagId = tagId, taskId = taskId)
-//}
 
-fun TaskAndStatusAggregateState.updateTask(name: String, description: String): TaskUpdatedEvent {
+fun TaskAndStatusAggregateState.updateTask(taskId: UUID, name: String, description: String): TaskUpdatedEvent {
     if (name.isEmpty()) {
         throw IllegalArgumentException("Task name should not be empty.")
     }
@@ -42,7 +25,7 @@ fun TaskAndStatusAggregateState.updateTask(name: String, description: String): T
     return TaskUpdatedEvent(this.getId(), name, description)
 }
 
-fun TaskAndStatusAggregateState.addExecutor(userId: UUID): ExecutorAddedEvent {
+fun TaskAndStatusAggregateState.addExecutor(taskId: UUID, userId: UUID): ExecutorAddedEvent {
     if (executors.contains(userId)) {
         throw IllegalArgumentException("User is already assigned as an executor for this task.")
     }
@@ -51,18 +34,12 @@ fun TaskAndStatusAggregateState.addExecutor(userId: UUID): ExecutorAddedEvent {
 }
 
 
-fun TaskAndStatusAggregateState.changeStatus(statusId: UUID): TaskStatusChangedEvent {
+fun TaskAndStatusAggregateState.changeStatus(taskId: UUID, statusId: UUID): TaskStatusChangedEvent {
     return TaskStatusChangedEvent(this.getId(), statusId)
 }
 
-fun ProjectAggregateState.createStatus(statusId: UUID, statusName: String, color: String): StatusCreatedEvent {
-    if (statusName.length > 255) {
-        throw IllegalArgumentException("Status name should be less than 255 characters!")
-    }
+fun ProjectAggregateState.createStatus(statusId: UUID, statusName: String, projectId:UUID, color: ColorEnum): StatusCreatedEvent {
 
-    if (projectStatuses.size == 50) {
-        throw IllegalArgumentException("Maximum number of statuses reached for the project.")
-    }
 
     return StatusCreatedEvent(projectId = this.getId(), statusId = statusId, statusName = statusName, color = color)
 }
