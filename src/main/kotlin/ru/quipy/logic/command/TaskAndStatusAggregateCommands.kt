@@ -1,5 +1,6 @@
 package ru.quipy.logic.command
 
+import javassist.NotFoundException
 import ru.quipy.api.*
 import ru.quipy.enum.ColorEnum
 import ru.quipy.logic.state.TaskAndStatusAggregateState
@@ -51,13 +52,13 @@ fun TaskAndStatusAggregateState.addExecutor(
         taskId: UUID,
         userId: UUID
 ): ExecutorAddedEvent {
-    val task = getTaskById(taskId) ?: throw NullPointerException("Task with id $taskId was not found.")
+    val task = getTaskById(taskId) ?: throw NotFoundException("Task with id $taskId was not found.")
 
     if (task.executors.contains(userId)) {
         throw IllegalArgumentException("User is already an executor of this task.")
     }
 
-    return ExecutorAddedEvent(this.getId(), userId)
+    return ExecutorAddedEvent(taskId, userId)
 }
 
 
@@ -78,7 +79,7 @@ fun TaskAndStatusAggregateState.createStatus(
     }
 
     return StatusCreatedEvent(
-            projectId = this.getId(),
+            projectId = projectId,
             statusId = statusId,
             statusName = statusName,
             color = color
@@ -87,7 +88,7 @@ fun TaskAndStatusAggregateState.createStatus(
 
 fun TaskAndStatusAggregateState.deleteStatus(statusId: UUID): StatusDeletedEvent {
     if (getStatusById(statusId) == null) {
-        throw NullPointerException("Status was not found.")
+        throw NotFoundException("Status was not found.")
     }
 
     if (getStatuses().size == 1) {

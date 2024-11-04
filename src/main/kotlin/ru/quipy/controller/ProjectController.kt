@@ -1,5 +1,6 @@
 package ru.quipy.controller
 
+import javassist.NotFoundException
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.bind.annotation.PostMapping
@@ -19,7 +20,7 @@ import ru.quipy.logic.command.createStatus
 import ru.quipy.logic.state.ProjectAggregateState
 import ru.quipy.logic.state.TaskAndStatusAggregateState
 import ru.quipy.logic.state.UserAggregateState
-import java.util.UUID
+import java.util.*
 
 @RestController
 @RequestMapping("/projects")
@@ -33,7 +34,7 @@ class ProjectController(
             @PathVariable projectId: UUID,
             @RequestParam userId: UUID
     ): ParticipantAddedEvent {
-        val user = userEsService.getState(userId) ?: throw NullPointerException("User $userId wasn't not found.")
+        val user = userEsService.getState(userId) ?: throw NotFoundException("User $userId wasn't not found.")
 
         return projectEsService.update(projectId) { it.addParticipantById(userId = userId) }
     }
@@ -44,7 +45,7 @@ class ProjectController(
             @RequestParam creatorId: UUID,
     ): ProjectCreatedEvent {
         val user = userEsService.getState(creatorId)
-                ?: throw IllegalArgumentException("User $creatorId was not not found.")
+                ?:throw IllegalArgumentException(("User $creatorId was not not found."))
 
         val response = projectEsService.create { it.createProject(UUID.randomUUID(), projectName) }
 

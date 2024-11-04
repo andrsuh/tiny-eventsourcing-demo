@@ -1,5 +1,6 @@
 package ru.quipy.logic.state
 
+import javassist.NotFoundException
 import ru.quipy.api.*
 import ru.quipy.core.annotations.StateTransitionFunc
 import ru.quipy.domain.AggregateState
@@ -46,7 +47,7 @@ class TaskAndStatusAggregateState : AggregateState<UUID, TaskAndStatusAggregate>
     @StateTransitionFunc
     fun taskUpdatedApply(event: TaskUpdatedEvent) {
         if (!tasks.containsKey(event.taskId))
-            throw NullPointerException("Task ${event.taskId} does not exist.")
+            throw NotFoundException("Task ${event.taskId} does not exist.")
 
         tasks[event.taskId]?.name = event.taskName
         tasks[event.taskId]?.description = event.description
@@ -55,7 +56,7 @@ class TaskAndStatusAggregateState : AggregateState<UUID, TaskAndStatusAggregate>
 
     @StateTransitionFunc
     fun executorAddedApply(event: ExecutorAddedEvent) {
-        val task = tasks[event.taskId] ?: throw NullPointerException("Task ${event.taskId} does not exist")
+        val task = tasks[event.taskId] ?: throw NotFoundException("Task ${event.taskId} does not exist")
 
         tasks[event.taskId]!!.executors.add(event.userId)
         updatedAt = createdAt
@@ -65,10 +66,10 @@ class TaskAndStatusAggregateState : AggregateState<UUID, TaskAndStatusAggregate>
     @StateTransitionFunc
     fun statusChangedApply(event: TaskStatusChangedEvent) {
         if (!projectStatuses.containsKey(event.statusId))
-            throw NullPointerException("Status ${event.statusId} does not exist.")
+            throw NotFoundException("Status ${event.statusId} does not exist.")
 
         if (!tasks.containsKey(event.taskId))
-            throw NullPointerException("Task ${event.taskId} does not exist.")
+            throw NotFoundException("Task ${event.taskId} does not exist.")
 
         tasks[event.taskId]?.statusId = event.statusId
 
@@ -92,7 +93,7 @@ class TaskAndStatusAggregateState : AggregateState<UUID, TaskAndStatusAggregate>
     @StateTransitionFunc
     fun statusDeletedApply(event: StatusDeletedEvent) {
         val status = projectStatuses[event.statusId]
-                ?: throw NullPointerException("Status ${event.statusId} does not exist.")
+                ?: throw NotFoundException("Status ${event.statusId} does not exist.")
 
         projectStatuses.remove(event.statusId)
         updatedAt = event.createdAt
@@ -101,7 +102,7 @@ class TaskAndStatusAggregateState : AggregateState<UUID, TaskAndStatusAggregate>
     @StateTransitionFunc
     fun statusPositionChangedApply(event: StatusPositionChangedEvent) {
         val status = projectStatuses[event.statusId]
-                ?: throw NullPointerException("Status with id ${event.statusId} does not exist.")
+                ?: throw NotFoundException("Status with id ${event.statusId} does not exist.")
 
         val prevPosition = status.position
 
@@ -110,7 +111,7 @@ class TaskAndStatusAggregateState : AggregateState<UUID, TaskAndStatusAggregate>
 
         if (event.position >= prevPosition) {
             projectStatuses.entries.forEach {
-                if (it.value.position < event.position && it.value.position >= prevPosition) {
+                if (it.value.position <= event.position && it.value.position > prevPosition) {
                     val tmp = it.value
                     tmp.position -= 1
                     projectStatuses[it.key] = tmp
@@ -118,9 +119,9 @@ class TaskAndStatusAggregateState : AggregateState<UUID, TaskAndStatusAggregate>
             }
         } else {
             projectStatuses.entries.forEach {
-                if (it.value.position > event.position && it.value.position <= prevPosition) {
+                if (it.value.position >= event.position && it.value.position < prevPosition) {
                     val tmp = it.value
-                    tmp.position -= 1
+                    tmp.position += 1
                     projectStatuses[it.key] = tmp
                 }
             }

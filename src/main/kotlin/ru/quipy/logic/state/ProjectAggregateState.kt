@@ -10,7 +10,6 @@ import java.util.UUID
 
 class ProjectAggregateState : AggregateState<UUID, ProjectAggregate> {
     private lateinit var projectId: UUID
-    private lateinit var taskAndStatusAggregateId: UUID
     private lateinit var name: String
     private var participants = mutableListOf<UUID>()
 
@@ -19,7 +18,6 @@ class ProjectAggregateState : AggregateState<UUID, ProjectAggregate> {
     var updatedAt: Long = System.currentTimeMillis()
 
     override fun getId() = projectId
-    fun getTaskAndStatusAggregateId() = taskAndStatusAggregateId
 
     fun getParticipants() = participants
 
