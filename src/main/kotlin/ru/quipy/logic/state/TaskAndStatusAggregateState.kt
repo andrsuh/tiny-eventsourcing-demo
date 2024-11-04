@@ -5,7 +5,7 @@ import ru.quipy.core.annotations.StateTransitionFunc
 import ru.quipy.domain.AggregateState
 import ru.quipy.entity.StatusEntity
 import ru.quipy.entity.TaskEntity
-import java.util.*
+import java.util.UUID
 
 class TaskAndStatusAggregateState : AggregateState<UUID, TaskAndStatusAggregate> {
     val MIN_POSITION: Int = 1

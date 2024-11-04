@@ -21,7 +21,7 @@ class ProjectEventsSubscriber {
 
     @PostConstruct
     fun init() {
-        subscriptionsManager.createSubscriber(ProjectAggregate::class, "some-meaningful-name") {
+//        subscriptionsManager.createSubscriber(ProjectAggregate::class, "some-meaningful-name") {
 //
 //            `when`(TaskCreatedEvent::class) { event ->
 //                logger.info("Task created: {}", event.taskName)
@@ -34,6 +34,6 @@ class ProjectEventsSubscriber {
 //            `when`(TagAssignedToTaskEvent::class) { event ->
 //                logger.info("Tag {} assigned to task {}: ", event.tagId, event.taskId)
 //            }
-        }
+//        }
     }
 }

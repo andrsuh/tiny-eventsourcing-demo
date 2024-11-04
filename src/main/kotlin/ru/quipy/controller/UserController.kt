@@ -6,7 +6,7 @@ import ru.quipy.core.EventSourcingService
 import ru.quipy.logic.*
 import ru.quipy.logic.command.createUser
 import ru.quipy.logic.state.UserAggregateState
-import java.util.*
+import java.util.UUID
 
 @RestController
 @RequestMapping("/users")
@@ -24,3 +24,7 @@ class UserController(
         return usersEsService.getState(id)
     }
 }
+//u2
+// f44ec693-4074-41d5-a6ac-51e2c884c96a
+//u3
+//2c2e779f-621b-4526-9a51-cb55a18249ac

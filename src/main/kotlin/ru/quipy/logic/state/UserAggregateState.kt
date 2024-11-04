@@ -4,7 +4,7 @@ import ru.quipy.api.UserAggregate
 import ru.quipy.api.UserCreatedEvent
 import ru.quipy.core.annotations.StateTransitionFunc
 import ru.quipy.domain.AggregateState
-import java.util.*
+import java.util.UUID
 
 class UserAggregateState : AggregateState<UUID, UserAggregate> {
     private lateinit var userId: UUID

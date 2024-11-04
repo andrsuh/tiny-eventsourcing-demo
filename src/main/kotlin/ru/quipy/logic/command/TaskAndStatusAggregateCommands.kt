@@ -3,7 +3,7 @@ package ru.quipy.logic.command
 import ru.quipy.api.*
 import ru.quipy.enum.ColorEnum
 import ru.quipy.logic.state.TaskAndStatusAggregateState
-import java.util.*
+import java.util.UUID
 
 fun TaskAndStatusAggregateState.createTask(
         id: UUID,

@@ -10,7 +10,7 @@ import ru.quipy.logic.*
 import ru.quipy.logic.command.*
 import ru.quipy.logic.state.ProjectAggregateState
 import ru.quipy.logic.state.TaskAndStatusAggregateState
-import java.util.*
+import java.util.UUID
 
 @RestController
 class TaskController(

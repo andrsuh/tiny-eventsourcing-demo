@@ -1,6 +1,6 @@
 package ru.quipy.entity
 
-import java.util.*
+import java.util.UUID
 
 data class TaskEntity(
         val id: UUID = UUID.randomUUID(),

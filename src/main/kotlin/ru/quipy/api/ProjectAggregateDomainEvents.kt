@@ -2,7 +2,7 @@ package ru.quipy.api
 
 import ru.quipy.core.annotations.DomainEvent
 import ru.quipy.domain.Event
-import java.util.*
+import java.util.UUID
 
 
 const val PROJECT_CREATED_EVENT = "PROJECT_CREATED_EVENT"

@@ -3,7 +3,7 @@ package ru.quipy.api
 import ru.quipy.core.annotations.DomainEvent
 import ru.quipy.domain.Event
 import ru.quipy.enum.ColorEnum
-import java.util.*
+import java.util.UUID
 
 const val TASK_CREATED_EVENT = "TASK_CREATED_EVENT"
 const val TASK_UPDATED_EVENT = "TASK_UPDATED_EVENT"

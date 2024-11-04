@@ -1,7 +1,7 @@
 package ru.quipy.entity
 
 import ru.quipy.enum.ColorEnum
-import java.util.*
+import java.util.UUID
 
 data class StatusEntity(
         val id: UUID,
