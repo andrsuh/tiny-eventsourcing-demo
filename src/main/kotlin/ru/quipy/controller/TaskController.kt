@@ -94,7 +94,7 @@ class TaskController(
         return tasksEsService.getState(project.getId())
     }
 
-    @PostMapping("/projects/{projectId}/statuses")
+    @PostMapping("/projects/{projectId}/status")
     fun createStatus(
             @PathVariable projectId: UUID,
             @RequestParam statusName: String,
@@ -116,7 +116,7 @@ class TaskController(
         }
     }
 
-    @GetMapping("projects/{projectId}/statuses/{id}")
+    @GetMapping("projects/{projectId}/status/{id}")
     fun getStatus(@PathVariable projectId: UUID, @PathVariable id: UUID): StatusEntity? {
         return tasksEsService.getState(projectId)?.getStatusById(id)
     }
@@ -133,7 +133,7 @@ class TaskController(
         return tasksEsService.update(project.getId()) { it.changeStatus(taskId, statusId) }
     }
 
-    @DeleteMapping("/projects/{projectId}/statuses/{statusId}")
+    @DeleteMapping("/projects/{projectId}/status/{statusId}")
     fun deleteStatus(@PathVariable projectId: UUID, @PathVariable statusId: UUID): StatusDeletedEvent {
         val project = projectEsService.getState(projectId)
                 ?: throw NotFoundException("Project $projectId was not found.")

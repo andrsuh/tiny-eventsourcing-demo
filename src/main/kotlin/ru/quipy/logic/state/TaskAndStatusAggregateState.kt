@@ -81,6 +81,19 @@ class TaskAndStatusAggregateState : AggregateState<UUID, TaskAndStatusAggregate>
 
     @StateTransitionFunc
     fun statusDeletedApply(event: StatusDeletedEvent) {
+        val status = projectStatuses[event.statusId]
+                ?: throw NotFoundException("Status with id ${event.statusId} was not exist.")
+
+        val position = status.position
+
+        projectStatuses.entries.forEach {
+            if (it.value.position > position) {
+                val tmp = it.value
+                tmp.position -= 1
+                projectStatuses[it.key] = tmp
+            }
+        }
+
         projectStatuses.remove(event.statusId)
         updatedAt = event.createdAt
     }
