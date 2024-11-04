@@ -46,9 +46,6 @@ class TaskAndStatusAggregateState : AggregateState<UUID, TaskAndStatusAggregate>
 
     @StateTransitionFunc
     fun taskUpdatedApply(event: TaskUpdatedEvent) {
-        if (!tasks.containsKey(event.taskId))
-            throw NotFoundException("Task ${event.taskId} does not exist.")
-
         tasks[event.taskId]?.name = event.taskName
         tasks[event.taskId]?.description = event.description
         updatedAt = event.createdAt
@@ -56,8 +53,6 @@ class TaskAndStatusAggregateState : AggregateState<UUID, TaskAndStatusAggregate>
 
     @StateTransitionFunc
     fun executorAddedApply(event: ExecutorAddedEvent) {
-        val task = tasks[event.taskId] ?: throw NotFoundException("Task ${event.taskId} does not exist")
-
         tasks[event.taskId]!!.executors.add(event.userId)
         updatedAt = createdAt
     }
@@ -65,12 +60,6 @@ class TaskAndStatusAggregateState : AggregateState<UUID, TaskAndStatusAggregate>
 
     @StateTransitionFunc
     fun statusChangedApply(event: TaskStatusChangedEvent) {
-        if (!projectStatuses.containsKey(event.statusId))
-            throw NotFoundException("Status ${event.statusId} does not exist.")
-
-        if (!tasks.containsKey(event.taskId))
-            throw NotFoundException("Task ${event.taskId} does not exist.")
-
         tasks[event.taskId]?.statusId = event.statusId
 
         updatedAt = event.createdAt
@@ -92,9 +81,6 @@ class TaskAndStatusAggregateState : AggregateState<UUID, TaskAndStatusAggregate>
 
     @StateTransitionFunc
     fun statusDeletedApply(event: StatusDeletedEvent) {
-        val status = projectStatuses[event.statusId]
-                ?: throw NotFoundException("Status ${event.statusId} does not exist.")
-
         projectStatuses.remove(event.statusId)
         updatedAt = event.createdAt
     }
@@ -102,12 +88,9 @@ class TaskAndStatusAggregateState : AggregateState<UUID, TaskAndStatusAggregate>
     @StateTransitionFunc
     fun statusPositionChangedApply(event: StatusPositionChangedEvent) {
         val status = projectStatuses[event.statusId]
-                ?: throw NotFoundException("Status with id ${event.statusId} does not exist.")
+                ?: throw NotFoundException("Status with id ${event.statusId} was not exist.")
 
         val prevPosition = status.position
-
-        if (event.position < MIN_POSITION || event.position > projectStatuses.size)
-            throw IllegalArgumentException("Position ${event.position} out of bound.")
 
         if (event.position >= prevPosition) {
             projectStatuses.entries.forEach {

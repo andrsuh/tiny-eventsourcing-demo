@@ -34,6 +34,9 @@ fun TaskAndStatusAggregateState.updateTask(
         name: String,
         description: String
 ): TaskUpdatedEvent {
+    if (getTaskById(taskId) == null)
+        throw NotFoundException("Task $taskId does not exist.")
+
     if (name.isEmpty()) {
         throw IllegalArgumentException("Task name should not be empty.")
     }
@@ -63,6 +66,12 @@ fun TaskAndStatusAggregateState.addExecutor(
 
 
 fun TaskAndStatusAggregateState.changeStatus(taskId: UUID, statusId: UUID): TaskStatusChangedEvent {
+    if (getStatusById(statusId) == null)
+        throw NotFoundException("Status $statusId does not exist.")
+
+    if (getTaskById(taskId) == null)
+        throw NotFoundException("Task $taskId does not exist.")
+
     return TaskStatusChangedEvent(
             taskId = taskId,
             statusId = statusId,
@@ -88,7 +97,7 @@ fun TaskAndStatusAggregateState.createStatus(
 
 fun TaskAndStatusAggregateState.deleteStatus(statusId: UUID): StatusDeletedEvent {
     if (getStatusById(statusId) == null) {
-        throw NotFoundException("Status was not found.")
+        throw NotFoundException("Status $statusId does not exist.")
     }
 
     if (getStatuses().size == 1) {
@@ -105,6 +114,13 @@ fun TaskAndStatusAggregateState.changeTaskStatusPosition(
         statusId: UUID,
         position: Int,
 ): StatusPositionChangedEvent {
+    val projectStatuses = getStatuses()
+    getStatusById(statusId) ?: throw NotFoundException("Status with id $statusId was not exist.")
+
+
+    if (position < MIN_POSITION || position > projectStatuses.size)
+        throw IllegalArgumentException("Position $position out of bound.")
+
     return StatusPositionChangedEvent(
             statusId = statusId,
             position = position,
