@@ -12,9 +12,10 @@ class ProjectAggregateState : AggregateState<UUID, ProjectAggregate> {
     var updatedAt: Long = System.currentTimeMillis()
 
     lateinit var projectTitle: String
-    lateinit var creatorId: String
+    lateinit var creatorId: UUID
     var tasks = mutableMapOf<UUID, TaskEntity>()
-    var projectTags = mutableMapOf<UUID, TagEntity>()
+    var statuses = mutableMapOf<UUID, StatusEntity>()
+    var members = mutableMapOf<UUID, ProjectMemberEntity>()
 
     override fun getId() = projectId
 
@@ -24,39 +25,73 @@ class ProjectAggregateState : AggregateState<UUID, ProjectAggregate> {
         projectId = event.projectId
         projectTitle = event.title
         creatorId = event.creatorId
-        updatedAt = createdAt
-    }
-
-    @StateTransitionFunc
-    fun tagCreatedApply(event: TagCreatedEvent) {
-        projectTags[event.tagId] = TagEntity(event.tagId, event.tagName)
+        members[event.creatorMemberId] = ProjectMemberEntity(event.creatorMemberId, event.creatorId)
+        statuses[event.defaultStatusId] = StatusEntity(event.defaultStatusId, "CREATED", "White")
         updatedAt = createdAt
     }
 
     @StateTransitionFunc
     fun taskCreatedApply(event: TaskCreatedEvent) {
-        tasks[event.taskId] = TaskEntity(event.taskId, event.taskName, mutableSetOf())
-        updatedAt = createdAt
+        tasks[event.taskId] = TaskEntity(event.taskId, event.taskName, event.statusId, mutableMapOf())
+        updatedAt = event.createdAt
+    }
+
+    @StateTransitionFunc
+    fun userAssignedApply(event: UserAssignedEvent) {
+        tasks[event.taskId]!!.executors[event.memberExecutorId] = ExecutorEntity(event.memberExecutorId, event.memberId)
+        updatedAt = event.createdAt
+    }
+
+    @StateTransitionFunc
+    fun taskStatusChangedApply(event: TaskStatusChangedEvent) {
+        tasks[event.taskId]!!.status = event.statusId
+        updatedAt = event.createdAt
+    }
+
+    @StateTransitionFunc
+    fun taskStatusCreatedApply(event: TaskStatusCreatedEvent) {
+        statuses[event.statusId] = StatusEntity(event.statusId, event.statusText, event.statusColor)
+        updatedAt = event.createdAt
+    }
+
+    @StateTransitionFunc
+    fun userAddedToProjectApply(event: UserAddedToProjectEvent) {
+        members[event.userMemberId] = ProjectMemberEntity(event.userMemberId, event.userId)
+        updatedAt = event.createdAt
+    }
+
+    @StateTransitionFunc
+    fun taskTittleChangedApply(event: TaskTittleChangedEvent) {
+        tasks[event.taskId]!!.name = event.newTittle
+        updatedAt = event.createdAt
+    }
+
+    @StateTransitionFunc
+    fun taskStatusDeletedApply(event: TaskStatusDeletedEvent) {
+        statuses.remove(event.statusId)
+        updatedAt = event.createdAt
     }
 }
 
 data class TaskEntity(
     val id: UUID = UUID.randomUUID(),
-    val name: String,
-    val tagsAssigned: MutableSet<UUID>
+    var name: String,
+    var status: UUID,
+    val executors: MutableMap<UUID, ExecutorEntity>,
 )
 
-data class TagEntity(
+data class StatusEntity(
     val id: UUID = UUID.randomUUID(),
-    val name: String
+    val statusText: String,
+    val statusColor: String,
 )
 
-/**
- * Demonstrates that the transition functions might be representer by "extension" functions, not only class members functions
- */
-@StateTransitionFunc
-fun ProjectAggregateState.tagAssignedApply(event: TagAssignedToTaskEvent) {
-    tasks[event.taskId]?.tagsAssigned?.add(event.tagId)
-        ?: throw IllegalArgumentException("No such task: ${event.taskId}")
-    updatedAt = createdAt
-}
+data class ProjectMemberEntity(
+    val id: UUID = UUID.randomUUID(),
+    val userId: UUID,
+)
+
+data class ExecutorEntity(
+    val id: UUID = UUID.randomUUID(),
+    val projectMemberId: UUID,
+)
