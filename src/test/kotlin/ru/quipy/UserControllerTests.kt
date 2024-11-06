@@ -19,6 +19,7 @@ class UserControllerTests {
                 "password",
                 "name"
         )
+        var r = response.userId
         Assertions.assertEquals("nickname", response.nickname)
         Assertions.assertEquals("name", response.uname)
         Assertions.assertEquals("password", response.password)
