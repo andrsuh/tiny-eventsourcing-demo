@@ -2,25 +2,8 @@
 This project demonstrates how easily you can build your event-driven, event sourcing based application POC in 15 minutes
 using [Tiny Event Sourcing library](https://github.com/andrsuh/tiny-event-sourcing)
 
-### Run PostgresDb
-This example uses Postgresql as an implementation of the Event store. You can see it in `pom.xml`:
-
-```
-<dependency>
-    <groupId>ru.quipy</groupId>
-    <artifactId>tiny-postgres-event-store-spring-boot-starter</artifactId>
-    <version>${tiny.es.version}</version>
-</dependency>
-```
-
-Thus, you have to run Potgresql in order to test this example. We have `docker-compose` file in the root. Run following command to start the database:
-
-```
-docker-compose up
-```
-
 ### Run MongoDb
-You can use MongoDb as an implementation of the Event store. To do it you have to add following lines into your `pom.xml`:
+This example uses MongoDb as an implementation of the Event store. You can see it in `pom.xml`:
 
 ```
 <dependency>
@@ -29,7 +12,7 @@ You can use MongoDb as an implementation of the Event store. To do it you have t
     <version>${tiny.es.version}</version>
 </dependency>
 ```
-§
+
 Thus, you have to run MongoDb in order to test this example. We have `docker-compose` file in the root. Run following command to start the database:
 
 ```
@@ -37,7 +20,7 @@ docker-compose up
 ```
 
 ### Run the application
-To make the application run you can start the main class `Application.kt`.
+To make the application run you can start the main class `DemoApplication`.
 
 ### Test the endpoints
 There are a couple of REST endpoints you can try to call.
