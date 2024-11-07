@@ -5,12 +5,10 @@ import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
-import ru.quipy.api.StatusCreatedEvent
 import ru.quipy.api.UserCreatedEvent
 import ru.quipy.controller.ProjectController
 import ru.quipy.controller.TaskController
 import ru.quipy.controller.UserController
-import ru.quipy.entity.StatusEntity
 import ru.quipy.enum.ColorEnum
 import ru.quipy.logic.state.ProjectAggregateState
 import java.lang.IllegalArgumentException
