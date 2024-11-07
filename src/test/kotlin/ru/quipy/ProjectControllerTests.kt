@@ -4,12 +4,9 @@ import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.context.ApplicationContextException
 import ru.quipy.api.UserCreatedEvent
 import ru.quipy.controller.ProjectController
-import ru.quipy.controller.TaskController
 import ru.quipy.controller.UserController
-import java.lang.IllegalArgumentException
 
 @SpringBootTest
 class ProjectControllerTests {

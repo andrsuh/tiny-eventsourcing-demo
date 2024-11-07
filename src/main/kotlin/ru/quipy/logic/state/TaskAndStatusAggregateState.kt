@@ -9,7 +9,10 @@ import ru.quipy.entity.TaskEntity
 import java.util.UUID
 
 class TaskAndStatusAggregateState : AggregateState<UUID, TaskAndStatusAggregate> {
-    val MIN_POSITION: Int = 1
+    companion object {
+        const val MIN_POSITION = 1
+    }
+
     private lateinit var taskId: UUID
     private var projectStatuses = mutableMapOf<UUID, StatusEntity>()
     private var tasks = mutableMapOf<UUID, TaskEntity>()
@@ -82,7 +85,7 @@ class TaskAndStatusAggregateState : AggregateState<UUID, TaskAndStatusAggregate>
     @StateTransitionFunc
     fun statusDeletedApply(event: StatusDeletedEvent) {
         val status = projectStatuses[event.statusId]
-                ?: throw NotFoundException("Status with id ${event.statusId} was not exist.")
+                ?: throw NotFoundException("Status with id ${event.statusId} does not exist.")
 
         val position = status.position
 
@@ -101,7 +104,7 @@ class TaskAndStatusAggregateState : AggregateState<UUID, TaskAndStatusAggregate>
     @StateTransitionFunc
     fun statusPositionChangedApply(event: StatusPositionChangedEvent) {
         val status = projectStatuses[event.statusId]
-                ?: throw NotFoundException("Status with id ${event.statusId} was not exist.")
+                ?: throw NotFoundException("Status with id ${event.statusId} does not exist.")
 
         val prevPosition = status.position
 

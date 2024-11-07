@@ -91,7 +91,8 @@ fun TaskAndStatusAggregateState.createStatus(
             projectId = projectId,
             statusId = statusId,
             statusName = statusName,
-            color = color
+            color = color,
+            position = getStatuses().size + 1
     )
 }
 
@@ -115,10 +116,10 @@ fun TaskAndStatusAggregateState.changeTaskStatusPosition(
         position: Int,
 ): StatusPositionChangedEvent {
     val projectStatuses = getStatuses()
-    getStatusById(statusId) ?: throw NotFoundException("Status with id $statusId was not exist.")
+    getStatusById(statusId) ?: throw NotFoundException("Status with id $statusId does not exist.")
 
 
-    if (position < MIN_POSITION || position > projectStatuses.size)
+    if (position < TaskAndStatusAggregateState.MIN_POSITION || position > projectStatuses.size)
         throw IllegalArgumentException("Position $position out of bound.")
 
     return StatusPositionChangedEvent(

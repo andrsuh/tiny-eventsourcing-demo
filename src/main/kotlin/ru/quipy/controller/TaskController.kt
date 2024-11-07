@@ -150,7 +150,7 @@ class TaskController(
         val project = projectEsService.getState(projectId)
                 ?: throw NotFoundException("Project $projectId was not found.")
 
-        return tasksEsService.update(project.getId()) {
+        return tasksEsService.update(projectId) {
             it.changeTaskStatusPosition(statusId, position)
         }
     }
