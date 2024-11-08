@@ -97,5 +97,28 @@ class TaskManagerTests {
 
     }
 
+    @Test
+    fun createTaskAndAssignParticipant() {
+        val project = projectController.createProject(
+                "TaskManager",
+                "krugarrr",
+                "sashulkaterentulka",
+                "Very cool and modern project made in USA, Omsk state")
+
+
+        projectController.createTask(project.projectId, "Watch skibidi guide")
+        val receivedProject = projectController.getProject(project.projectId)
+        val task = receivedProject?.tasks?.entries?.first()?.value
+        val participant = project.participants.entries.first().value;
+        if (task != null) {
+            projectController.addParticipant(project.projectId, task.id, participant.id)
+        }
+        val receivedProjectWithUpdatedTask = projectController.getProject(project.projectId)
+        val updatedTask = receivedProjectWithUpdatedTask?.tasks?.entries?.first()?.value
+        Assertions.assertEquals(1, updatedTask?.performersAssigned?.count())
+        Assertions.assertNotEquals(task?.performersAssigned?.count(), updatedTask?.performersAssigned?.count())
+        Assertions.assertEquals(participant.id, updatedTask?.performersAssigned?.first())
+    }
+
 
 }
