@@ -6,29 +6,38 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
-import ru.quipy.api.ProjectAggregate
-import ru.quipy.api.ProjectCreatedEvent
-import ru.quipy.api.TaskCreatedEvent
+import ru.quipy.api.*
 import ru.quipy.core.EventSourcingService
-import ru.quipy.logic.ProjectAggregateState
-import ru.quipy.logic.addTask
-import ru.quipy.logic.create
+import ru.quipy.logic.*
 import java.util.*
 
 @RestController
 @RequestMapping("/projects")
 class ProjectController(
+    val userEsService: EventSourcingService<UUID, UserAggregate, UserAggregateState>,
     val projectEsService: EventSourcingService<UUID, ProjectAggregate, ProjectAggregateState>
 ) {
 
     @PostMapping("/create")
-    fun createProject(@RequestParam projectTitle: String, @RequestParam description: String) : ProjectCreatedEvent {
-        return projectEsService.create { it.create(UUID.randomUUID(), projectTitle, description) }
+    fun createProject(@RequestParam projectTitle: String, @RequestParam description: String,  @RequestParam userId: UUID) : ProjectCreatedEvent {
+        val createProjectEvent =  projectEsService.create { it.create(UUID.randomUUID(), projectTitle, description)}
+        userEsService.update(userId) {it.addProject(projectEsService.getState(createProjectEvent.projectId)) }
+        return createProjectEvent
     }
 
     @GetMapping("/{projectId}")
     fun getAccount(@PathVariable projectId: UUID) : ProjectAggregateState? {
         return projectEsService.getState(projectId)
+    }
+
+    @PostMapping("/{projectId}/status")
+    fun createStatus(@PathVariable projectId: UUID, @RequestParam name: String) : StatusCreatedEvent {
+        return projectEsService.create { it.createStatus(name) }
+    }
+
+    @PostMapping("/{projectId}/{statusId}")
+    fun assignStatus(@PathVariable projectId: UUID, @PathVariable statusId: UUID, @RequestParam taskId: UUID) : StatusAssignedToTaskEvent {
+        return projectEsService.create { it.assignStatusToTask(statusId=statusId, taskId=taskId) }
     }
 
     @PostMapping("/{projectId}/tasks/add")
