@@ -15,6 +15,7 @@ fun UserAggregateState.create(userId: UUID, login: String, password: String, use
     )
 }
 
-fun UserAggregateState.addProject(projectId: UUID): ProjectAddedEvent {
-    return ProjectAddedEvent(userId = this.getId(), projectId = projectId)
+fun UserAggregateState.addProject(project: ProjectAggregateState?): ProjectAddedEvent {
+    if (project == null) throw IllegalArgumentException("Project doesn't exists")
+    return ProjectAddedEvent(userId = this.getId(), projectId = project.getId())
 }

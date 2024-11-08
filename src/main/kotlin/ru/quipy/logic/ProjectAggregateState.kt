@@ -8,7 +8,7 @@ import java.util.*
 // Service's business logic
 class ProjectAggregateState : AggregateState<UUID, ProjectAggregate> {
     private lateinit var projectId: UUID
-    private lateinit var baseStatusId: UUID
+    var baseStatus: StatusEntity = StatusEntity()
     var createdAt: Long = System.currentTimeMillis()
     var updatedAt: Long = System.currentTimeMillis()
 
@@ -26,6 +26,7 @@ class ProjectAggregateState : AggregateState<UUID, ProjectAggregate> {
         projectTitle = event.title
         projectDescription = event.description
         updatedAt = createdAt
+        projectStatuses[baseStatus.id] = baseStatus
     }
 
     @StateTransitionFunc
@@ -97,8 +98,8 @@ data class TaskEntity(
 
 data class StatusEntity(
     val id: UUID = UUID.randomUUID(),
-    val name: String,
-    var order: Int
+    val name: String = "CREATED",
+    var order: Int = 0
 )
 
 /**

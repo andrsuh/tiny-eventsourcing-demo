@@ -10,7 +10,8 @@ import java.util.*
 @RestController
 @RequestMapping("/users")
 class UserController(
-    val userEsService: EventSourcingService<UUID, UserAggregate, UserAggregateState>
+    val userEsService: EventSourcingService<UUID, UserAggregate, UserAggregateState>,
+    val projectEsService: EventSourcingService<UUID, ProjectAggregate, ProjectAggregateState>
 ) {
 
     @PostMapping("/register")
@@ -20,7 +21,8 @@ class UserController(
 
     @PostMapping("/{userId}/addProject")
     fun addProject(@PathVariable userId: UUID, @RequestParam projectId: UUID) : ProjectAddedEvent {
-        return userEsService.update(userId) { it.addProject(projectId) }
+        val project = projectEsService.getState(projectId)
+        return userEsService.update(userId) { it.addProject(project) }
     }
 
     @GetMapping("/{userId}")
