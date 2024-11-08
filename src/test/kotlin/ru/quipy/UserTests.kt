@@ -23,14 +23,6 @@ import java.util.*
 
 @SpringBootTest
 class UserTests {
-	companion object {
-		private val projectId = UUID.randomUUID()
-		private val userId = UUID.randomUUID()
-		private val login = "testUser"
-		private val password = "testPassword"
-		private val username = "user"
-	}
-
 	@Autowired
 	lateinit var userEsService: EventSourcingService<UUID, UserAggregate, UserAggregateState>
 
@@ -40,29 +32,20 @@ class UserTests {
 	@Autowired
 	lateinit var mongoTemplate: MongoTemplate
 
-//	@Before
-//	fun init()
-//	{
-//		cleanDatabase()
-//	}
-
-	@BeforeTestExecution
+	@BeforeEach
 	fun cleanDatabase() {
-		mongoTemplate.dropCollection<UserAggregate>()
-		mongoTemplate.dropCollection(UserAggregate::class.java)
-		mongoTemplate.dropCollection(ProjectAggregate::class.java)
 		mongoTemplate.getCollection("aggregate-user").drop()
 		mongoTemplate.getCollection("aggregate-project").drop()
-//		mongoTemplate.getCollection("snapshots").drop()
-		mongoTemplate.remove(Query.query(Criteria.where("aggregateId").`is`(userId)), "aggregate-user")
-		mongoTemplate.remove(Query.query(Criteria.where("_id").`is`(projectId)), "aggregate-project")
 	}
 
 	@Test
 	fun createUserTest() {
-		 /** User creation with credentials - user has right credentials */
-		userEsService.create { it.create(userId, login, password, username) }
+		val userId = UUID.randomUUID()
+		val login = "testUser"
+		val password = "testPassword"
+		val username = "user"
 
+		userEsService.create { it.create(userId, login, password, username) }
 		val state = userEsService.getState(userId)
 
 		Assertions.assertNotNull(state)
@@ -76,12 +59,17 @@ class UserTests {
 
 	@Test
 	fun assignProjectToUserTest() {
+		val projectId = UUID.randomUUID()
+		val userId = UUID.randomUUID()
+		val login = "testUser"
+		val password = "testPassword"
+		val username = "user"
 		val title = "title"
 		val description = "description"
+
 		userEsService.create { it.create(userId, login, password, username) }
 		projectEsService.create { it.create(projectId, title, description) }
 		val project = projectEsService.getState(projectId)
-
 		userEsService.update(userId) {it.addProject(project)}
 		val state = userEsService.getState(userId)
 
@@ -94,6 +82,11 @@ class UserTests {
 
 	@Test
 	fun assignProjectToUserTest_NoSuchProject() {
+		val userId = UUID.randomUUID()
+		val login = "testUser"
+		val password = "testPassword"
+		val username = "user"
+
 		userEsService.create { it.create(userId, login, password, username) }
 
 		Assertions.assertThrows(IllegalArgumentException::class.java) {
@@ -103,8 +96,14 @@ class UserTests {
 
 	@Test
 	fun assignProjectToUserTest_AssignTwice() {
+		val projectId = UUID.randomUUID()
+		val userId = UUID.randomUUID()
+		val login = "testUser"
+		val password = "testPassword"
+		val username = "user"
 		val title = "title"
 		val description = "description"
+
 		userEsService.create { it.create(userId, login, password, username) }
 		projectEsService.create { it.create(projectId, title, description) }
 		val project = projectEsService.getState(projectId)
