@@ -15,16 +15,6 @@ class TaskManagerTests {
 
     @Autowired
     private lateinit var projectController: ProjectController
-    //@Autowired
-//	lateinit var mongoTemplate: MongoTemplate
-//	@BeforeEach
-//	fun Init() {
-//		cleanDataBase()
-//	}
-//
-//	fun cleanDataBase() {
-//		mongoTemplate.remove(Query.query(Criteria.where()))
-//	}
 
     @Test
     fun registerUserAndCompareWithReceivedUser() {
@@ -100,11 +90,10 @@ class TaskManagerTests {
             }
         }
 
-        //тут непонятно че с методом assign происходит, пока на уточнении, дальше допилю
-//        val receivedProjectWithNewTaskStatus = projectController.getProject(project.projectId)
-//        val updatedTask = receivedProjectWithNewTaskStatus?.tasks?.entries?.first()?.value
-//
-//        Assertions.assertEquals(newTaskStatus?.id, updatedTask?.taskStatusesAssigned?.first())
+        val receivedProjectWithNewTaskStatus = projectController.getProject(project.projectId)
+        val updatedTask = receivedProjectWithNewTaskStatus?.tasks?.entries?.first()?.value
+
+        Assertions.assertEquals(newTaskStatus?.id, updatedTask?.taskStatusesAssigned?.last())
 
     }
 
