@@ -4,24 +4,25 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
-import ru.quipy.api.project.ProjectAggregate
-import ru.quipy.api.project.StatusCreatedEvent
+import ru.quipy.api.user.UserAggregate
+import ru.quipy.api.user.UserCreatedEvent
 import ru.quipy.streams.AggregateSubscriptionsManager
 import javax.annotation.PostConstruct
 
 @Service
-class ProjectEventsSubscriber {
+class UserEventsSubscriber {
 
-    val logger: Logger = LoggerFactory.getLogger(ProjectEventsSubscriber::class.java)
+    val logger: Logger = LoggerFactory.getLogger(UserEventsSubscriber::class.java)
 
     @Autowired
     lateinit var subscriptionsManager: AggregateSubscriptionsManager
 
     @PostConstruct
     fun init() {
-        subscriptionsManager.createSubscriber(ProjectAggregate::class, "ProjectAggregateSubscriber") {
-            `when`(StatusCreatedEvent::class) { event ->
-                logger.info("Tag created: {}", event.statusName)
+        subscriptionsManager.createSubscriber(UserAggregate::class, "UserAggregateSubscriber") {
+
+            `when`(UserCreatedEvent::class) { event ->
+                logger.info("User created with id {}", event.userId)
             }
         }
     }
