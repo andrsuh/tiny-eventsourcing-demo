@@ -13,14 +13,16 @@ class TaskAndStatusAggregateState : AggregateState<UUID, TaskAndStatusAggregate>
         const val MIN_POSITION = 1
     }
 
-    private lateinit var taskId: UUID
+    private lateinit var projectId: UUID
     private var projectStatuses = mutableMapOf<UUID, StatusEntity>()
     private var tasks = mutableMapOf<UUID, TaskEntity>()
 
     var createdAt: Long = System.currentTimeMillis()
     var updatedAt: Long = System.currentTimeMillis()
 
-    override fun getId() = taskId
+    override fun getId() = projectId
+
+    fun getProjectId() = projectId
 
     fun getTasks() = tasks.values.toList()
 
@@ -71,7 +73,7 @@ class TaskAndStatusAggregateState : AggregateState<UUID, TaskAndStatusAggregate>
 
     @StateTransitionFunc
     fun statusCreatedApply(event: StatusCreatedEvent) {
-        taskId = event.projectId
+        projectId = event.projectId
         projectStatuses[event.statusId] = StatusEntity(
                 id = event.statusId,
                 name = event.statusName,
