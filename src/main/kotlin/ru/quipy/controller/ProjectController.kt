@@ -21,9 +21,9 @@ class ProjectController(
     val projectEsService: EventSourcingService<UUID, ProjectAggregate, ProjectAggregateState>
 ) {
 
-    @PostMapping("/{projectTitle}")
-    fun createProject(@PathVariable projectTitle: String, @RequestParam creatorId: String) : ProjectCreatedEvent {
-        return projectEsService.create { it.create(UUID.randomUUID(), projectTitle, creatorId) }
+    @PostMapping("/create")
+    fun createProject(@RequestParam projectTitle: String, @RequestParam description: String) : ProjectCreatedEvent {
+        return projectEsService.create { it.create(UUID.randomUUID(), projectTitle, description) }
     }
 
     @GetMapping("/{projectId}")
@@ -31,10 +31,10 @@ class ProjectController(
         return projectEsService.getState(projectId)
     }
 
-    @PostMapping("/{projectId}/tasks/{taskName}")
-    fun createTask(@PathVariable projectId: UUID, @PathVariable taskName: String) : TaskCreatedEvent {
+    @PostMapping("/{projectId}/tasks/add")
+    fun createTask(@PathVariable projectId: UUID, @RequestParam taskName: String, @RequestParam description: String) : TaskCreatedEvent {
         return projectEsService.update(projectId) {
-            it.addTask(taskName)
+            it.addTask(name = taskName, description = description)
         }
     }
 }
