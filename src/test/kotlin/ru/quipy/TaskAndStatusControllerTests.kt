@@ -197,6 +197,12 @@ class TaskAndStatusControllerTests {
         Assertions.assertEquals(3, taskController.getStatus(projectId, status2.statusId)!!.position)
         Assertions.assertEquals(2, taskController.getStatus(projectId, status3.statusId)!!.position)
 
+        taskController.changeTaskStatusPosition(projectId, status3.statusId, 3)
+
+        Assertions.assertEquals(1, taskController.getStatus(projectId, defStatusId)!!.position)
+        Assertions.assertEquals(2, taskController.getStatus(projectId, status2.statusId)!!.position)
+        Assertions.assertEquals(3, taskController.getStatus(projectId, status3.statusId)!!.position)
+
         Assertions.assertThrows(
                 IllegalArgumentException::class.java
         ) {
@@ -213,6 +219,86 @@ class TaskAndStatusControllerTests {
                 IllegalArgumentException::class.java
         ) {
             taskController.changeTaskStatusPosition(projectId, status3.statusId, 0)
+        }
+    }
+
+    @Test
+    fun GetCreateTaskInNotExistingProject_ThrowsException() {
+        val owner = createUser("Owner")
+        ownerId = owner.userId
+        val user = createUser("Participant")
+        userId = user.userId
+
+        val project = createProject(owner.userId)
+        projectId = project!!.getId()
+
+        val taskAggregate = taskController.getTaskStatusesAndTasks(project!!.getId())
+
+
+        val defStatus = taskController.getStatus(projectId, taskAggregate!!.getStatuses()[0].id)
+        defStatusId = defStatus!!.id
+
+        Assertions.assertNotNull(defStatus)
+        Assertions.assertEquals("CREATED", defStatus!!.name)
+        Assertions.assertEquals(ColorEnum.GREEN, defStatus.color)
+        Assertions.assertEquals(1, defStatus.position)
+
+        val status2 = taskController.createStatus(
+                projectId,
+                "In progress",
+                "YELLOW"
+        )
+        statusId2 = status2.statusId
+
+        Assertions.assertThrows(
+                NotFoundException::class.java
+        ) {
+            taskController.createTask(
+                    UUID.randomUUID(),
+                    "Task",
+                    "Task d",
+                    status2.statusId,
+            )
+        }
+    }
+
+    @Test
+    fun GetCreateTaskWithNotExistingStatus_ThrowsException() {
+        val owner = createUser("Owner")
+        ownerId = owner.userId
+        val user = createUser("Participant")
+        userId = user.userId
+
+        val project = createProject(owner.userId)
+        projectId = project!!.getId()
+
+        val taskAggregate = taskController.getTaskStatusesAndTasks(project!!.getId())
+
+
+        val defStatus = taskController.getStatus(projectId, taskAggregate!!.getStatuses()[0].id)
+        defStatusId = defStatus!!.id
+
+        Assertions.assertNotNull(defStatus)
+        Assertions.assertEquals("CREATED", defStatus!!.name)
+        Assertions.assertEquals(ColorEnum.GREEN, defStatus.color)
+        Assertions.assertEquals(1, defStatus.position)
+
+        val status2 = taskController.createStatus(
+                projectId,
+                "In progress",
+                "YELLOW"
+        )
+        statusId2 = status2.statusId
+
+        Assertions.assertThrows(
+                NotFoundException::class.java
+        ) {
+            taskController.createTask(
+                    projectId,
+                    "Task",
+                    "Task d",
+                    UUID.randomUUID(),
+            )
         }
     }
 

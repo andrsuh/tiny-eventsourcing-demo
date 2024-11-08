@@ -20,6 +20,9 @@ fun TaskAndStatusAggregateState.createTask(
         throw IllegalArgumentException("Task with name $name already exists.")
     }
 
+    if (getStatusById(statusId) == null)
+        throw NotFoundException("Status $statusId does not exist.")
+
     return TaskCreatedEvent(
             taskId = id,
             taskName = name,
