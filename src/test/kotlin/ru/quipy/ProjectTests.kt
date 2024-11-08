@@ -198,6 +198,22 @@ class ProjectTests {
     }
 
     @Test
+    fun createStatus_assignDoesntExistsTaskToStatus() {
+        val projectId = UUID.randomUUID()
+        val title = "title"
+        val description = "description"
+        val statusName = "Status"
+
+        projectEsService.create { it.create(projectId, title, description) }
+        val statusId = projectEsService.update(projectId) { it.createStatus(statusName) }.statusId
+        val taskId = UUID.randomUUID()
+
+        Assertions.assertThrows(IllegalArgumentException::class.java) {
+            projectEsService.update(projectId) {it.assignStatusToTask(statusId=statusId, taskId=taskId)}
+        }
+    }
+
+    @Test
     fun createProject_deleteStatusWithTasks() {
         val projectId = UUID.randomUUID()
         val title = "title"
@@ -217,7 +233,7 @@ class ProjectTests {
     }
 
     @Test
-    fun createProject_changeStatusOrderFrom1ToLast() {
+    fun changeStatusOrder_From1ToLast() {
         val projectId = UUID.randomUUID()
         val title = "title"
         val description = "description"
@@ -237,6 +253,48 @@ class ProjectTests {
         Assertions.assertEquals(statusId2, statuses[1].id)
         Assertions.assertEquals(statusId3, statuses[2].id)
         Assertions.assertEquals(statusId1, statuses[3].id)
+    }
+
+    @Test
+    fun changeStatusOrder_FromLastToMiddle() {
+        val projectId = UUID.randomUUID()
+        val title = "title"
+        val description = "description"
+        val statusName1 = "Status1"
+        val statusName2 = "Status2"
+        val statusName3 = "Status3"
+
+        projectEsService.create { it.create(projectId, title, description) }
+        val statusId1 = projectEsService.update(projectId) { it.createStatus(statusName1) }.statusId
+        val statusId2 = projectEsService.update(projectId) { it.createStatus(statusName2) }.statusId
+        val statusId3 = projectEsService.update(projectId) { it.createStatus(statusName3) }.statusId
+        val newOrderIndex = 2
+        projectEsService.update(projectId) {it.changeStatusOrder(statusId3, newOrderIndex)}
+        val statuses = projectEsService.getState(projectId)!!.projectStatuses.values.sortedBy { it.order }
+
+        Assertions.assertEquals(4, statuses.size)
+        Assertions.assertEquals(statusId1, statuses[1].id)
+        Assertions.assertEquals(statusId3, statuses[2].id)
+        Assertions.assertEquals(statusId2, statuses[3].id)
+    }
+
+    @Test
+    fun changeStatusOrder_StatusDoesntExists() {
+        val projectId = UUID.randomUUID()
+        val title = "title"
+        val description = "description"
+        val statusName1 = "Status1"
+        val statusName2 = "Status2"
+        val statusName3 = "Status3"
+
+        projectEsService.create { it.create(projectId, title, description) }
+        val statusId1 = projectEsService.update(projectId) { it.createStatus(statusName1) }.statusId
+        val statusId2 = projectEsService.update(projectId) { it.createStatus(statusName2) }.statusId
+        val statusId3 = UUID.randomUUID()
+        val newOrderIndex = 2
+        Assertions.assertThrows(IllegalArgumentException::class.java) {
+            projectEsService.update(projectId) {it.changeStatusOrder(statusId3, newOrderIndex)}
+        }
     }
 
     @Test
@@ -283,8 +341,6 @@ class ProjectTests {
         val projectId = UUID.randomUUID()
         val title = "title"
         val description = "description"
-        val newTaskName = "JoJo"
-        val newTaskDescription = "D4C"
         val userId = UUID.randomUUID()
         val login = "testUser"
         val password = "testPassword"
@@ -305,7 +361,65 @@ class ProjectTests {
             Assertions.assertEquals(1, task.performers.size)
             Assertions.assertEquals(userId, task.performers[0])
         }
+    }
 
+    @Test
+    fun assignTaskPerformer_nullUser() {
+        val projectId = UUID.randomUUID()
+        val title = "title"
+        val description = "description"
+        val taskName = "task"
+        val taskDescription = "taskDescription"
+
+        val user = null
+        projectEsService.create { it.create(projectId, title, description) }
+        val taskId = projectEsService.update(projectId) { it.addTask(taskName, taskDescription) }.taskId
+        Assertions.assertThrows(IllegalArgumentException::class.java) {
+            projectEsService.update(projectId) {it.assignTaskPerformer(taskId=taskId, user=user) }
+        }
+    }
+
+    @Test
+    fun assignTaskPerformer_taskDoesntExist() {
+        val projectId = UUID.randomUUID()
+        val title = "title"
+        val description = "description"
+        val userId = UUID.randomUUID()
+        val login = "testUser"
+        val password = "testPassword"
+        val username = "user"
+
+        userEsService.create { it.create(userId, login, password, username) }
+        val user = userEsService.getState(userId)
+        projectEsService.create { it.create(projectId, title, description) }
+        val taskId = UUID.randomUUID()
+
+        Assertions.assertThrows(IllegalArgumentException::class.java) {
+            projectEsService.update(projectId) {it.assignTaskPerformer(taskId=taskId, user=user) }
+        }
+    }
+
+    @Test
+    fun assignTaskPerformer_twice() {
+        val projectId = UUID.randomUUID()
+        val title = "title"
+        val description = "description"
+        val userId = UUID.randomUUID()
+        val login = "testUser"
+        val password = "testPassword"
+        val username = "user"
+        val taskName = "task"
+        val taskDescription = "taskDescription"
+
+        userEsService.create { it.create(userId, login, password, username) }
+        val user = userEsService.getState(userId)
+        projectEsService.create { it.create(projectId, title, description) }
+        val taskId = projectEsService.update(projectId) { it.addTask(taskName, taskDescription) }.taskId
+        projectEsService.update(projectId) {it.assignTaskPerformer(taskId=taskId, user=user) }
+
+        Assertions.assertThrows(IllegalArgumentException::class.java) {
+            projectEsService.update(projectId) {it.assignTaskPerformer(taskId=taskId, user=user) }
+        }
     }
 
 }

@@ -80,7 +80,7 @@ fun ProjectAggregateState.changeStatusOrder(statusId: UUID, newOrder: Int): Stat
     var lastOrder = newOrder
 
     projectStatuses.values.sortedBy { it.order }.forEach {
-        if (it.order == lastOrder) {
+        if (it.id != statusId && it.order >= lastOrder) {
             newStatusOrder[it.id] = lastOrder + 1
             lastOrder += 1
         }

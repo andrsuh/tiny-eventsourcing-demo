@@ -115,5 +115,4 @@ class UserTests {
 			userEsService.update(userId) {it.addProject(project)}
 		}
 	}
-
 }
