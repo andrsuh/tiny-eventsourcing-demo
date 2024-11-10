@@ -34,7 +34,7 @@ import javax.annotation.PostConstruct
  * ```
  */
 @Configuration
-class EventSourcingLibConfiguration {
+open class EventSourcingLibConfiguration {
 
     private val logger = LoggerFactory.getLogger(EventSourcingLibConfiguration::class.java)
 
@@ -54,7 +54,7 @@ class EventSourcingLibConfiguration {
      * Use this object to create/update the aggregate
      */
     @Bean
-    fun projectEsService() = eventSourcingServiceFactory.create<UUID, ProjectAggregate, ProjectAggregateState>()
+    open fun projectEsService() = eventSourcingServiceFactory.create<UUID, ProjectAggregate, ProjectAggregateState>()
 
     @PostConstruct
     fun init() {
