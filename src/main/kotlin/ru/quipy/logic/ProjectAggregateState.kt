@@ -35,11 +35,13 @@ class ProjectAggregateState : AggregateState<UUID, ProjectAggregate> {
     @StateTransitionFunc
     fun participantAddedApply(event: ProjectParticipantAddedEvent) {
         participants.add(event.userId)
+        updatedAt = System.currentTimeMillis()
     }
 
     @StateTransitionFunc
     fun projectNameEditApply(event: ProjectNameEditedEvent) {
         projectTitle = event.newProjectName
+        updatedAt = System.currentTimeMillis()
     }
 
     @StateTransitionFunc
@@ -49,45 +51,53 @@ class ProjectAggregateState : AggregateState<UUID, ProjectAggregate> {
             name = event.taskName,
             taskStatus = TaskStatusEntity.DEFAULT
         )
+        updatedAt = System.currentTimeMillis()
 
     }
 
     @StateTransitionFunc
     fun taskNameEditApply(event: TaskNameEditedEvent) {
         tasks[event.taskId]?.name = event.newTaskName
+        updatedAt = System.currentTimeMillis()
     }
 
     @StateTransitionFunc
     fun taskPerformerSet(event: TaskPerfomerSetEvent) {
         tasks[event.taskId]?.performers?.add(event.performer)
+        updatedAt = System.currentTimeMillis()
     }
 
     @StateTransitionFunc
     fun taskPerformerDeleted(event: TaskPerfomerDeletedEvent) {
         tasks[event.taskId]?.performers?.remove(event.performer)
+        updatedAt = System.currentTimeMillis()
     }
 
     @StateTransitionFunc
     fun taskDeleted(event: TaskDeletedEvent) {
         tasks.remove(event.taskId)
+        updatedAt = System.currentTimeMillis()
     }
 
     @StateTransitionFunc
     fun taskStatusCreatedApply(event: TaskStatusCreatedEvent) {
         val taskId = UUID.randomUUID()
         taskStatuses[taskId] = TaskStatusEntity(taskId, event.statusName, event.statusColor)
+        updatedAt = System.currentTimeMillis()
     }
 
     @StateTransitionFunc
     fun taskStatusSet(event: TaskStatusSetEvent) {
         val taskStatus = taskStatuses.values.first { it.name == event.statusName }
         tasks[event.taskId]?.taskStatus = taskStatus
+        updatedAt = System.currentTimeMillis()
     }
 
     @StateTransitionFunc
     fun taskStatusDeleted(event: TaskStatusDeletedEvent) {
         val taskStatus = taskStatuses.values.first { it.name == event.statusName }
         taskStatuses.remove(taskStatus.id)
+        updatedAt = System.currentTimeMillis()
     }
 }
 
