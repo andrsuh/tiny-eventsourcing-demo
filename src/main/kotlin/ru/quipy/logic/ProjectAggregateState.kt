@@ -6,7 +6,6 @@ import ru.quipy.domain.AggregateState
 import java.util.*
 import javax.xml.bind.annotation.XmlType.DEFAULT
 
-//TODO: разобраться с updatedAt
 class ProjectAggregateState : AggregateState<UUID, ProjectAggregate> {
     private lateinit var projectId: UUID
 
