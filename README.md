@@ -2,6 +2,11 @@
 This project demonstrates how easily you can build your event-driven, event sourcing based application POC in 15 minutes
 using [Tiny Event Sourcing library](https://github.com/andrsuh/tiny-event-sourcing)
 
+### Run the application
+```sh
+sudo docker-compose up --build
+```
+
 ### Run PostgresDb
 This example uses Postgresql as an implementation of the Event store. You can see it in `pom.xml`:
 
@@ -13,39 +18,15 @@ This example uses Postgresql as an implementation of the Event store. You can se
 </dependency>
 ```
 
-Thus, you have to run Potgresql in order to test this example. We have `docker-compose` file in the root. Run following command to start the database:
-
-```
-docker-compose up
-```
-
-### Run MongoDb
-You can use MongoDb as an implementation of the Event store. To do it you have to add following lines into your `pom.xml`:
-
-```
-<dependency>
-    <groupId>ru.quipy</groupId>
-    <artifactId>tiny-mongo-event-store-spring-boot-starter</artifactId>
-    <version>${tiny.es.version}</version>
-</dependency>
-```
-§
-Thus, you have to run MongoDb in order to test this example. We have `docker-compose` file in the root. Run following command to start the database:
-
-```
-docker-compose up
-```
-
-### Run the application
-To make the application run you can start the main class `Application.kt`.
-
 ### Test the endpoints
 There are a couple of REST endpoints you can try to call.
 
 To create new Project with name "Project" and creator user "Andrey" call:
 
-```
-POST http://localhost:8080/projects/Project?creatorId="Andrey"
+`POST http://localhost:8080/projects/Project?creatorId="Andrey"`
+
+```sh
+curl -X POST "http://localhost:8080/projects/Project" -d "creatorId=Mikhail"
 ```
 
 As a response you will receive the corresponding event if everything went well:
@@ -65,16 +46,20 @@ As a response you will receive the corresponding event if everything went well:
 
 Now lets add some Task with name "Task" to the project. Take the projectId from previous response and perform:
 
+```sh
+curl -X POST "http://localhost:8081/projects/823d4576-5e95-4027-bd9e-63b27086256c/tasks/Task" \
+     -H "Content-Type: application/json" \
+     -d '{"description": "This is a sample task description", "status": "open"}'
 ```
-POST http://localhost:8081/projects/823d4576-5e95-4027-bd9e-63b27086256c/tasks/Task 
-```
+
+
 
 You will receive corresponding `TASK_CREATED_EVENT` if everything ok
 
 Now lets fetch the current state of the ProjectAggregate:
 
-```
-GET http://localhost:8081/projects/823d4576-5e95-4027-bd9e-63b27086256c
+```sh
+curl -X GET "http://localhost:8080/projects/{projectId}"
 ```
 
 You will receive something like this:
