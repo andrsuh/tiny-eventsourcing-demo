@@ -9,6 +9,7 @@ import ru.quipy.api.UserAggregate
 import ru.quipy.core.EventSourcingServiceFactory
 import ru.quipy.logic.ProjectAggregateState
 import ru.quipy.logic.UserAggregateState
+import ru.quipy.projections.AnnotationBasedProjectEventsSubscriber
 //import ru.quipy.projections.AnnotationBasedProjectEventsSubscriber
 import ru.quipy.streams.AggregateEventStreamManager
 import ru.quipy.streams.AggregateSubscriptionsManager
@@ -43,8 +44,8 @@ class EventSourcingLibConfiguration {
     @Autowired
     private lateinit var subscriptionsManager: AggregateSubscriptionsManager
 
-//    @Autowired
-//    private lateinit var projectEventSubscriber: AnnotationBasedProjectEventsSubscriber
+    @Autowired
+    private lateinit var projectEventSubscriber: AnnotationBasedProjectEventsSubscriber
 
     @Autowired
     private lateinit var eventSourcingServiceFactory: EventSourcingServiceFactory
@@ -67,15 +68,15 @@ class EventSourcingLibConfiguration {
 //        subscriptionsManager.subscribe<ProjectAggregate>(projectEventSubscriber)
 
         // Demonstrates how you can set up the listeners to the event stream
-        eventStreamManager.maintenance {
-            onRecordHandledSuccessfully { streamName, eventName ->
-                logger.info("Stream $streamName successfully processed record of $eventName")
-            }
-
-            onBatchRead { streamName, batchSize ->
-                logger.info("Stream $streamName read batch size: $batchSize")
-            }
-        }
+//        eventStreamManager.maintenance {
+//            onRecordHandledSuccessfully { streamName, eventName ->
+//                logger.info("Stream $streamName successfully processed record of $eventName")
+//            }
+//
+//            onBatchRead { streamName, batchSize ->
+//                logger.info("Stream $streamName read batch size: $batchSize")
+//            }
+//        }
     }
 
 }

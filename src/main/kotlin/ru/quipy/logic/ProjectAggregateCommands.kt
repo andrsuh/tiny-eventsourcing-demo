@@ -10,6 +10,7 @@ import java.util.*
 fun ProjectAggregateState.create(id: UUID, name: String, ownerId: UUID): ProjectCreatedEvent {
     return ProjectCreatedEvent(
         projectId = id,
+        default_status_id = DEFAULT_STATUS.statusId,
         projectName = name,
         ownerId = ownerId
     )
@@ -38,10 +39,11 @@ fun ProjectAggregateState.removeUser(userId: UUID): ProjectUserRemovedEvent {
     )
 }
 
-fun ProjectAggregateState.createTask(userId: UUID, name: String): ProjectTaskCreatedEvent {
+fun ProjectAggregateState.createTask(userId: UUID, taskId: UUID, name: String): ProjectTaskCreatedEvent {
     return ProjectTaskCreatedEvent(
         projectId = this.getId(),
         userId = userId,
+        taskId = taskId,
         taskName = name
     )
 }
@@ -52,6 +54,7 @@ fun ProjectAggregateState.modifyTask(
     executors: MutableSet<UUID>? = null,
     name: String? = null
 ): ProjectTaskModifiedEvent {
+//    println(tasks);
     if (!tasks.containsKey(taskId)) {
         throw IllegalArgumentException("Task not found");
     }
@@ -67,12 +70,13 @@ fun ProjectAggregateState.modifyTask(
     )
 }
 
-fun ProjectAggregateState.createStatus(name: String): ProjectStatusCreatedEvent {
+fun ProjectAggregateState.createStatus(name: String, statusId: UUID): ProjectStatusCreatedEvent {
     if (statuses.values.any { it.name == name } || name.isEmpty()) {
         throw IllegalArgumentException("Invalid status name");
     }
     return ProjectStatusCreatedEvent(
         projectId = this.getId(),
+        statusId = statusId,
         statusName = name
     )
 }

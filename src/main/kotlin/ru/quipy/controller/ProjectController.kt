@@ -57,7 +57,7 @@ class ProjectController(
         @RequestParam name: String
     ) : ProjectTaskCreatedEvent {
         return projectEsService.update(projectId) {
-            it.createTask(userId, name)
+            it.createTask(userId, UUID.randomUUID(), name)
         }
     }
 
@@ -90,7 +90,7 @@ class ProjectController(
         @RequestParam name: String
     ) : ProjectStatusCreatedEvent {
         return projectEsService.update(projectId) {
-            it.createStatus(name)
+            it.createStatus(name, UUID.randomUUID())
         }
     }
 

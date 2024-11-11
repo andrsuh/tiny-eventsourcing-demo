@@ -17,6 +17,7 @@ const val PROJECT_STATUS_REMOVED_EVENT = "PROJECT_STATUS_REMOVED_EVENT"
 
 @DomainEvent(name = PROJECT_CREATED_EVENT)
 class ProjectCreatedEvent(
+    val default_status_id: UUID,
     val projectId: UUID,
     val projectName: String,
     val ownerId: UUID,
@@ -50,6 +51,7 @@ class ProjectUserRemovedEvent(
 class ProjectTaskCreatedEvent(
     val projectId: UUID,
     val userId: UUID,
+    val taskId: UUID,
     val taskName: String,
     createdAt: Long = System.currentTimeMillis(),
 ) : Event<ProjectAggregate>(
@@ -73,6 +75,7 @@ class ProjectTaskModifiedEvent(
 @DomainEvent(name = PROJECT_STATUS_CREATED_EVENT)
 class ProjectStatusCreatedEvent(
     val projectId: UUID,
+    val statusId: UUID,
     val statusName: String,
     createdAt: Long = System.currentTimeMillis(),
 ) : Event<ProjectAggregate>(
