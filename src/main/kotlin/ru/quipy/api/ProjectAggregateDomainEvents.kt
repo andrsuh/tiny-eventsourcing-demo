@@ -10,7 +10,6 @@ const val PROJECT_USER_REMOVED_EVENT = "PROJECT_USER_REMOVED_EVENT"
 const val PROJECT_TASK_CREATED_EVENT = "PROJECT_TASK_CREATED_EVENT"
 const val PROJECT_TASK_MODIFIED_EVENT = "PROJECT_TASK_MODIFIED_EVENT"
 const val PROJECT_STATUS_CREATED_EVENT = "PROJECT_STATUS_CREATED_EVENT"
-const val PROJECT_STATUS_DEFAULT_MODIFIED_EVENT = "PROJECT_STATUS_DEFAULT_MODIFIED_EVENT"
 const val PROJECT_STATUS_REMOVED_EVENT = "PROJECT_STATUS_REMOVED_EVENT"
 
 //// API
@@ -83,15 +82,7 @@ class ProjectStatusCreatedEvent(
     createdAt = createdAt
 )
 
-@DomainEvent(name = PROJECT_STATUS_DEFAULT_MODIFIED_EVENT)
-class ProjectStatusDefaultModifiedEvent(
-    val projectId: UUID,
-    val statusId: UUID,
-    createdAt: Long = System.currentTimeMillis(),
-) : Event<ProjectAggregate>(
-    name = PROJECT_STATUS_DEFAULT_MODIFIED_EVENT,
-    createdAt = createdAt
-)
+
 
 @DomainEvent(name = PROJECT_STATUS_REMOVED_EVENT)
 class ProjectStatusRemovedEvent(

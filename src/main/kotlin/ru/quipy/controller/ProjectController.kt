@@ -94,15 +94,6 @@ class ProjectController(
         }
     }
 
-    @PatchMapping("/{projectId}/statuses/default")
-    fun modifyDefaultStatus(
-        @PathVariable projectId: UUID,
-        @PathVariable statusId: UUID
-    ) : ProjectStatusDefaultModifiedEvent {
-        return projectEsService.update(projectId) {
-            it.setDefaultStatus(statusId)
-        }
-    }
 
     @DeleteMapping("/{projectId}/status/{statusId}")
     fun removeStatus(

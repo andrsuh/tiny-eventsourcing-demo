@@ -19,7 +19,11 @@ class ProjectAggregateState : AggregateState<UUID, ProjectAggregate> {
     var tasks: MutableMap<UUID, TaskEntity> = mutableMapOf()
     var statuses: MutableMap<UUID, StatusEntity> = mutableMapOf()
 //    lateinit var default_status_id: UUID;
-    lateinit var DEFAULT_STATUS: StatusEntity;
+     var DEFAULT_STATUS: StatusEntity = StatusEntity(
+        name = "Default name",
+        statusId = UUID.randomUUID(),
+        color = DEFAULT_COLOR
+    );
 
     override fun getId(): UUID = projectId
 
@@ -32,12 +36,12 @@ class ProjectAggregateState : AggregateState<UUID, ProjectAggregate> {
             statusId = event.default_status_id,
             color = DEFAULT_COLOR
         )
-
+        DEFAULT_STATUS = default_status
         projectId = event.projectId
         name = event.projectName
         ownerId = event.ownerId
         statuses[DEFAULT_STATUS.statusId] = default_status
-        DEFAULT_STATUS = default_status
+
     }
 
     @StateTransitionFunc

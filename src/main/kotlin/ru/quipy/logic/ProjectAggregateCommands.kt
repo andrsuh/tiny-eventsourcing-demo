@@ -81,15 +81,6 @@ fun ProjectAggregateState.createStatus(name: String, statusId: UUID): ProjectSta
     )
 }
 
-fun ProjectAggregateState.setDefaultStatus(statusId: UUID): ProjectStatusDefaultModifiedEvent {
-    if (!statuses.containsKey(statusId)) {
-        throw IllegalArgumentException("Status not found");
-    }
-    return ProjectStatusDefaultModifiedEvent(
-        projectId = this.getId(),
-        statusId = statusId
-    )
-}
 
 fun ProjectAggregateState.removeStatus(statusId: UUID): ProjectStatusRemovedEvent {
     if (!statuses.containsKey(statusId)) {
