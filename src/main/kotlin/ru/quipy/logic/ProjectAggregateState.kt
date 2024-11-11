@@ -6,57 +6,94 @@ import ru.quipy.domain.AggregateState
 import java.util.*
 
 // Service's business logic
-class ProjectAggregateState : AggregateState<UUID, ProjectAggregate> {
+
+class ProjectAggregateState: AggregateState<UUID, ProjectAggregate> {
+    val DEFAULT_COLOR = "#000000"
+    val DEFAULT_STATUS = StatusEntity(
+        name = "Default name",
+        color = DEFAULT_COLOR
+    )
+
     private lateinit var projectId: UUID
-    var createdAt: Long = System.currentTimeMillis()
-    var updatedAt: Long = System.currentTimeMillis()
+    lateinit var name: String
+    lateinit var ownerId: UUID
 
-    lateinit var projectTitle: String
-    lateinit var creatorId: String
-    var tasks = mutableMapOf<UUID, TaskEntity>()
-    var projectTags = mutableMapOf<UUID, TagEntity>()
+    var members: MutableSet<UUID> = mutableSetOf()
+    var tasks: MutableMap<UUID, TaskEntity> = mutableMapOf()
+    var statuses: MutableMap<UUID, StatusEntity> = mutableMapOf()
+    lateinit var defaultStatusId: UUID
 
-    override fun getId() = projectId
+    override fun getId(): UUID = projectId
 
     // State transition functions which is represented by the class member function
     @StateTransitionFunc
-    fun projectCreatedApply(event: ProjectCreatedEvent) {
+    fun createdApply(event: ProjectCreatedEvent) {
         projectId = event.projectId
-        projectTitle = event.title
-        creatorId = event.creatorId
-        updatedAt = createdAt
+        name = event.projectName
+        ownerId = event.ownerId
+        statuses[DEFAULT_STATUS.statusId] = DEFAULT_STATUS
+        defaultStatusId = DEFAULT_STATUS.statusId
     }
 
     @StateTransitionFunc
-    fun tagCreatedApply(event: TagCreatedEvent) {
-        projectTags[event.tagId] = TagEntity(event.tagId, event.tagName)
-        updatedAt = createdAt
+    fun userAddedApply(event: ProjectUserAddedEvent) {
+        members.add(event.userId)
     }
 
     @StateTransitionFunc
-    fun taskCreatedApply(event: TaskCreatedEvent) {
-        tasks[event.taskId] = TaskEntity(event.taskId, event.taskName, mutableSetOf())
-        updatedAt = createdAt
+    fun userRemovedApply(event: ProjectUserRemovedEvent) {
+        members.remove(event.userId)
+    }
+
+    @StateTransitionFunc
+    fun createdTaskApply(event: ProjectTaskCreatedEvent) {
+        val task = TaskEntity(
+            ownerId = event.userId,
+            name = event.taskName,
+            statusId = TODO(),
+            executors = mutableSetOf()
+        )
+        tasks[task.taskId] = task
+    }
+
+    @StateTransitionFunc
+    fun modifiedTaskApply(event: ProjectTaskModifiedEvent) {
+        val task = tasks[event.taskId] ?: return
+        task.statusId = event.statusId ?: task.statusId
+        task.executors = event.executors ?: task.executors
+        task.name = event.taskName ?: task.name
+    }
+
+    @StateTransitionFunc
+    fun statusCreatedApply(event: ProjectStatusCreatedEvent) {
+        val status = StatusEntity(
+            name = event.statusName,
+            color = DEFAULT_COLOR
+        )
+        statuses[status.statusId] = status
+    }
+
+    @StateTransitionFunc
+    fun statusDefaultModifiedApply(event: ProjectStatusDefaultModifiedEvent) {
+        defaultStatusId = event.statusId
+    }
+
+    @StateTransitionFunc
+    fun statusRemovedApply(event: ProjectStatusRemovedEvent) {
+        statuses.remove(event.statusId)
     }
 }
 
 data class TaskEntity(
-    val id: UUID = UUID.randomUUID(),
+    val taskId: UUID = UUID.randomUUID(),
+    val ownerId: UUID,
+    var name: String,
+    var statusId: UUID,
+    var executors: MutableSet<UUID> = mutableSetOf()
+)
+
+data class StatusEntity(
+    val statusId: UUID = UUID.randomUUID(),
     val name: String,
-    val tagsAssigned: MutableSet<UUID>
+    var color: String
 )
-
-data class TagEntity(
-    val id: UUID = UUID.randomUUID(),
-    val name: String
-)
-
-/**
- * Demonstrates that the transition functions might be representer by "extension" functions, not only class members functions
- */
-@StateTransitionFunc
-fun ProjectAggregateState.tagAssignedApply(event: TagAssignedToTaskEvent) {
-    tasks[event.taskId]?.tagsAssigned?.add(event.tagId)
-        ?: throw IllegalArgumentException("No such task: ${event.taskId}")
-    updatedAt = createdAt
-}

@@ -1,42 +1,101 @@
 package ru.quipy.logic
 
-import ru.quipy.api.ProjectCreatedEvent
-import ru.quipy.api.TagAssignedToTaskEvent
-import ru.quipy.api.TagCreatedEvent
-import ru.quipy.api.TaskCreatedEvent
+import ru.quipy.api.*
 import java.util.*
 
 
 // Commands : takes something -> returns event
 // Here the commands are represented by extension functions, but also can be the class member functions
 
-fun ProjectAggregateState.create(id: UUID, title: String, creatorId: String): ProjectCreatedEvent {
+fun ProjectAggregateState.create(id: UUID, name: String, ownerId: UUID): ProjectCreatedEvent {
     return ProjectCreatedEvent(
         projectId = id,
-        title = title,
-        creatorId = creatorId,
+        projectName = name,
+        ownerId = ownerId
     )
 }
 
-fun ProjectAggregateState.addTask(name: String): TaskCreatedEvent {
-    return TaskCreatedEvent(projectId = this.getId(), taskId = UUID.randomUUID(), taskName = name)
+fun ProjectAggregateState.addUser(userId: UUID): ProjectUserAddedEvent {
+    if (members.any { it == userId } || ownerId == userId) {
+        throw IllegalArgumentException("User already in project");
+    }
+    return ProjectUserAddedEvent(
+        projectId = this.getId(),
+        userId = userId
+    )
 }
 
-fun ProjectAggregateState.createTag(name: String): TagCreatedEvent {
-    if (projectTags.values.any { it.name == name }) {
-        throw IllegalArgumentException("Tag already exists: $name")
+fun ProjectAggregateState.removeUser(userId: UUID): ProjectUserRemovedEvent {
+    if (ownerId == userId) {
+        throw IllegalArgumentException("Cannot remove owner");
     }
-    return TagCreatedEvent(projectId = this.getId(), tagId = UUID.randomUUID(), tagName = name)
+    if (!members.any { it == userId }) {
+        throw IllegalArgumentException("User not found in project");
+    }
+    return ProjectUserRemovedEvent(
+        projectId = this.getId(),
+        userId = userId
+    )
 }
 
-fun ProjectAggregateState.assignTagToTask(tagId: UUID, taskId: UUID): TagAssignedToTaskEvent {
-    if (!projectTags.containsKey(tagId)) {
-        throw IllegalArgumentException("Tag doesn't exists: $tagId")
-    }
+fun ProjectAggregateState.createTask(userId: UUID, name: String): ProjectTaskCreatedEvent {
+    return ProjectTaskCreatedEvent(
+        projectId = this.getId(),
+        userId = userId,
+        taskName = name
+    )
+}
 
+fun ProjectAggregateState.modifyTask(
+    taskId: UUID,
+    statusId: UUID? = null,
+    executors: MutableSet<UUID>? = null,
+    name: String? = null
+): ProjectTaskModifiedEvent {
     if (!tasks.containsKey(taskId)) {
-        throw IllegalArgumentException("Task doesn't exists: $taskId")
+        throw IllegalArgumentException("Task not found");
     }
+    if (statusId != null && !statuses.containsKey(statusId)) {
+        throw IllegalArgumentException("Status not found");
+    }
+    return ProjectTaskModifiedEvent(
+        projectId = this.getId(),
+        taskId = taskId,
+        statusId = statusId,
+        executors = executors,
+        taskName = name,
+    )
+}
 
-    return TagAssignedToTaskEvent(projectId = this.getId(), tagId = tagId, taskId = taskId)
+fun ProjectAggregateState.createStatus(name: String): ProjectStatusCreatedEvent {
+    if (statuses.values.any { it.name == name } || name.isEmpty()) {
+        throw IllegalArgumentException("Invalid status name");
+    }
+    return ProjectStatusCreatedEvent(
+        projectId = this.getId(),
+        statusName = name
+    )
+}
+
+fun ProjectAggregateState.setDefaultStatus(statusId: UUID): ProjectStatusDefaultModifiedEvent {
+    if (!statuses.containsKey(statusId)) {
+        throw IllegalArgumentException("Status not found");
+    }
+    return ProjectStatusDefaultModifiedEvent(
+        projectId = this.getId(),
+        statusId = statusId
+    )
+}
+
+fun ProjectAggregateState.removeStatus(statusId: UUID): ProjectStatusRemovedEvent {
+    if (!statuses.containsKey(statusId)) {
+        throw IllegalArgumentException("Status not found");
+    }
+    if (!tasks.values.any { it.statusId == statusId }) {
+        throw IllegalArgumentException("Status is still used");
+    }
+    return ProjectStatusRemovedEvent(
+        projectId = this.getId(),
+        statusId = statusId
+    )
 }
