@@ -28,13 +28,13 @@ class AnnotationBasedProjectEventsSubscriber {
     }
 
     @SubscribeEvent
-    fun projectUserAddedSubscriber(event: ProjectUserAddedEvent) {
+    fun projectUserAddedSubscriber(event: ProjectMemberCreatedEvent) {
         logger.info("User with id {} was added to the project with id {}",
             event.userId, event.projectId)
     }
 
     @SubscribeEvent
-    fun projectUserRemovedSubscriber(event: ProjectUserRemovedEvent) {
+    fun projectUserRemovedSubscriber(event: ProjectMemberRemovedEvent) {
         logger.info("User with id {} was removed from the project with id {}",
             event.userId, event.projectId)
     }
