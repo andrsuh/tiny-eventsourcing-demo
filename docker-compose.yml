@@ -4,18 +4,18 @@ services:
     hostname: event_sourcing_db
     image: postgres:14.9-alpine
     env_file:
-      - ./.env
+      - .env
     environment:
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     ports:
-      - ${POSTGRES_DB_PORT}:${POSTGRES_DB_PORT}
+      - ${POSTGRES_DB_PORT}:5432
     restart: unless-stopped
   mongo:
     build:
       context: mongoDb
-#      dockerfile: mongoDb/Dockerfile
+      dockerfile: /Dockerfile
     restart: always
     ports:
       - 27017:27017

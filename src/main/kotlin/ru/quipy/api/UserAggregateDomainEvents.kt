@@ -5,6 +5,7 @@ import ru.quipy.domain.Event
 import java.util.UUID
 
 const val USER_CREATED_EVENT = "USER_CREATED_EVENT"
+const val USER_GET_EVENT = "USER_GET_EVENT"
 
 @DomainEvent(name = USER_CREATED_EVENT)
 class UserCreatedEvent(

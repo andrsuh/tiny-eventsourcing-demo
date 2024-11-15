@@ -28,4 +28,5 @@ class UserAggregateState : AggregateState<UUID, UserAggregate> {
         createdAt = event.createdAt
         updatedAt = createdAt
     }
+
 }

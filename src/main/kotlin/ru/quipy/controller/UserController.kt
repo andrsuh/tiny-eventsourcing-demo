@@ -17,7 +17,7 @@ class UserController(val userEsService: EventSourcingService<UUID, UserAggregate
 
     @PostMapping
     fun createUser(@RequestBody request: CreateUserRequest) : UserCreatedEvent {
-        return userEsService.create { it.create(UUID.randomUUID(), request.username.map(), request.login, request.password) }
+        return userEsService.create { it.create( UUID.randomUUID(), request.username.map(), request.login, request.password) }
     }
 }
 
