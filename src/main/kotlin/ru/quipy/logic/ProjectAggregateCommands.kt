@@ -68,10 +68,10 @@ fun ProjectAggregateState.updateTask(taskId: UUID, taskName: String?, taskDescri
         throw IllegalArgumentException("Task with id $taskId doesn't exist")
     }
 
-    return TaskUpdatedEvent(projectId = this.getId(), taskId = UUID.randomUUID(), taskName, taskDescription)
+    return TaskUpdatedEvent(projectId = this.getId(), taskId, taskName, taskDescription)
 }
 
-fun ProjectAggregateState.addExecutor(taskId: UUID, userId: UUID) : TaskExecutorAddedEvent {
+fun ProjectAggregateState.addAssignee(taskId: UUID, userId: UUID) : TaskAssignedEvent {
     if (!tasks.containsKey(taskId)) {
         throw IllegalArgumentException("Task with id $taskId doesn't exist")
     }
@@ -80,7 +80,7 @@ fun ProjectAggregateState.addExecutor(taskId: UUID, userId: UUID) : TaskExecutor
         throw IllegalArgumentException("User with id $userId is not a participant of the project")
     }
 
-    return TaskExecutorAddedEvent(projectId = this.getId(), taskId = taskId, userId = userId)
+    return TaskAssignedEvent(projectId = this.getId(), taskId = taskId, userId = userId)
 }
 
 fun ProjectAggregateState.removeTask(taskId: UUID): TaskDeletedEvent {
@@ -111,7 +111,7 @@ fun ProjectAggregateState.removeTag(tagId: UUID): TagDeletedEvent {
     return TagDeletedEvent(tagId = tagId, projectID = this.getId())
 }
 
-fun ProjectAggregateState.assignTagToTask(taskId: UUID, tagId: UUID): TagAssignedToTaskEvent {
+fun ProjectAggregateState.addTagToTask(taskId: UUID, tagId: UUID): TagAddedToTaskEvent {
     if (!projectTags.containsKey(tagId)) {
         throw IllegalArgumentException("Tag doesn't exists: $tagId")
     }
@@ -120,5 +120,5 @@ fun ProjectAggregateState.assignTagToTask(taskId: UUID, tagId: UUID): TagAssigne
         throw IllegalArgumentException("Task doesn't exists: $taskId")
     }
 
-    return TagAssignedToTaskEvent(projectId = this.getId(), taskId = taskId, tagId = tagId)
+    return TagAddedToTaskEvent(projectId = this.getId(), taskId = taskId, tagId = tagId)
 }

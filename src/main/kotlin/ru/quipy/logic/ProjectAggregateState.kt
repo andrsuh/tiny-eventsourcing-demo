@@ -61,17 +61,20 @@ class ProjectAggregateState : AggregateState<UUID, ProjectAggregate> {
     fun taskUpdatedApply(event: TaskUpdatedEvent) {
         val task: TaskEntity = tasks[event.taskId] ?: throw IllegalStateException("Task not found")
 
-        task.name = event.taskName
-        task.description = event.taskDescription
+        if (event.taskName != null)
+            task.name = event.taskName
+
+        if (event.taskDescription != null)
+            task.description = event.taskDescription
     }
 
     @StateTransitionFunc
-    fun taskExecutorAddedApply(event: TaskExecutorAddedEvent) {
+    fun taskAssignedApply(event: TaskAssignedEvent) {
         val task: TaskEntity = tasks[event.taskId] ?: throw IllegalStateException("Task not found")
 
         val participant: ParticipantEntity = participants[event.userId] ?: throw IllegalStateException("Participant not found")
 
-        task.executor =  participant
+        task.assignee =  participant
         updatedAt = event.createdAt
     }
 
@@ -98,7 +101,7 @@ data class TaskEntity(
     val id: UUID = UUID.randomUUID(),
     var name: String,
     var description: String = "",
-    var executor: ParticipantEntity? = null,
+    var assignee: ParticipantEntity? = null,
     val tagsAssigned: MutableSet<UUID>
 )
 
@@ -117,10 +120,10 @@ enum class Color {
 }
 
 /**
- * Demonstrates that the transition functions might be representer by "extension" functions, not only class members functions
+ * Demonstrates that the transition functions might be represented by "extension" functions, not only class members functions
  */
 @StateTransitionFunc
-fun ProjectAggregateState.tagAssignedApply(event: TagAssignedToTaskEvent) {
+fun ProjectAggregateState.tagAddedToTaskApply(event: TagAddedToTaskEvent) {
     tasks[event.taskId]?.tagsAssigned?.add(event.tagId) ?: throw IllegalArgumentException("No such task: ${event.taskId}")
     updatedAt = createdAt
 }

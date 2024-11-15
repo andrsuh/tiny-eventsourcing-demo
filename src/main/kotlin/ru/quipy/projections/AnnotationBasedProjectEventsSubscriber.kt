@@ -52,7 +52,7 @@ class AnnotationBasedProjectEventsSubscriber {
     }
 
     @SubscribeEvent
-    fun taskExecutorAddedSubscriber(event: TaskExecutorAddedEvent) {
+    fun taskExecutorAddedSubscriber(event: TaskAssignedEvent) {
         logger.info("User with id {} became executor of task with id {} in project with id {}",
             event.userId, event.taskId, event.projectId)
     }
@@ -70,7 +70,7 @@ class AnnotationBasedProjectEventsSubscriber {
     }
 
     @SubscribeEvent
-    fun tagAssignedToTaskSubscriber(event: TagAssignedToTaskEvent) {
+    fun tagAssignedToTaskSubscriber(event: TagAddedToTaskEvent) {
         logger.info("Tag with id {} was assigned to task with id {} in project with id {}",
             event.tagId, event.taskId, event.projectId)
     }
