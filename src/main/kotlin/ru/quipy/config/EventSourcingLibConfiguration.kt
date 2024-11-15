@@ -42,7 +42,7 @@ open class EventSourcingLibConfiguration {
     private val logger = LoggerFactory.getLogger(EventSourcingLibConfiguration::class.java)
 
     @Autowired
-    private lateinit var subscriptionsManager: AggregateSubscriptionsManager
+   private lateinit var subscriptionsManager: AggregateSubscriptionsManager
 
     @Autowired
     private lateinit var projectEventSubscriber: AnnotationBasedProjectEventsSubscriber

@@ -13,7 +13,7 @@ import ru.quipy.streams.annotation.SubscribeEvent
 )
 class AnnotationBasedUserEventsSubscriber {
 
-    val logger: Logger = LoggerFactory.getLogger(AnnotationBasedUserEventsSubscriber::class.java)
+   val logger: Logger = LoggerFactory.getLogger(AnnotationBasedUserEventsSubscriber::class.java)
 
     @SubscribeEvent
     fun userCreatedSubscriber(event: UserCreatedEvent) {
