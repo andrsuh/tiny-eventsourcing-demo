@@ -70,6 +70,12 @@ class AnnotationBasedProjectEventsSubscriber {
     }
 
     @SubscribeEvent
+    fun tagDeletedSubscriber(event: TagDeletedEvent) {
+        logger.info("Tag with id {} was deleted from project with id {}",
+            event.tagId, event.projectID)
+    }
+
+    @SubscribeEvent
     fun tagAssignedToTaskSubscriber(event: TagAddedToTaskEvent) {
         logger.info("Tag with id {} was assigned to task with id {} in project with id {}",
             event.tagId, event.taskId, event.projectId)
