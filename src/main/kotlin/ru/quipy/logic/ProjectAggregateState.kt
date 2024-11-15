@@ -45,14 +45,14 @@ class ProjectAggregateState : AggregateState<UUID, ProjectAggregate> {
     }
 
     @StateTransitionFunc
-    fun projectUserAddedApply(event: ProjectUserAddedEvent) {
+    fun projectUserAddedApply(event: ProjectMemberCreatedEvent) {
         participants[event.userId] = ParticipantEntity(id = event.userId)
         updatedAt = event.createdAt
     }
 
     // TODO Delete also from all tasks entities
     @StateTransitionFunc
-    fun projectUserRemovedApply(event: ProjectUserRemovedEvent) {
+    fun projectUserRemovedApply(event: ProjectMemberRemovedEvent) {
         participants.remove(event.userId)
         updatedAt = event.createdAt
     }
@@ -83,7 +83,7 @@ class ProjectAggregateState : AggregateState<UUID, ProjectAggregate> {
 
     @StateTransitionFunc
     fun tagCreatedApply(event: TagCreatedEvent) {
-        projectTags[event.tagId] = TagEntity(event.tagId, event.tagName)
+        projectTags[event.tagId] = TagEntity(event.tagId, event.tagName, Color.valueOf(event.tagColor))
         updatedAt = createdAt
     }
 
@@ -104,12 +104,17 @@ data class TaskEntity(
 
 data class TagEntity(
     val id: UUID = UUID.randomUUID(),
-    val name: String
+    val name: String = "CREATED",
+    val color: Color
 )
 
 data class ParticipantEntity (
     val id: UUID = UUID.randomUUID(),
 )
+
+enum class Color {
+    GREEN, BLUE, YELLOW, RED, PURPLE
+}
 
 /**
  * Demonstrates that the transition functions might be representer by "extension" functions, not only class members functions
