@@ -22,7 +22,7 @@ const val TASK_DELETED_EVENT = "TASK_DELETED_EVENT"
 class ProjectCreatedEvent(
     val projectId: UUID,
     val title: String,
-    val creatorId: String,
+    val creatorId: UUID,
     createdAt: Long = System.currentTimeMillis(),
 ) : Event<ProjectAggregate>(
     name = PROJECT_CREATED_EVENT,
@@ -32,8 +32,8 @@ class ProjectCreatedEvent(
 @DomainEvent(name = PROJECT_UPDATED_EVENT)
 class ProjectUpdatedEvent(
     val projectId: UUID,
-    val title: String,
-    val description: String,
+    val title: String?,
+    val description: String?,
     createdAt: Long = System.currentTimeMillis(),
 ) : Event<ProjectAggregate> (
     name = PROJECT_UPDATED_EVENT,

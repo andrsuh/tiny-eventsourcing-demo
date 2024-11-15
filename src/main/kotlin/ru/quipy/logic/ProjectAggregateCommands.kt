@@ -7,24 +7,24 @@ import java.util.*
 // Commands : takes something -> returns event
 // Here the commands are represented by extension functions, but also can be the class member functions
 
-fun ProjectAggregateState.create(id: UUID, title: String, creatorId: String): ProjectCreatedEvent {
+fun ProjectAggregateState.create(id: UUID, title: String, creatorId: UUID): ProjectCreatedEvent {
     return ProjectCreatedEvent(
         projectId = id,
         title = title,
-        creatorId = creatorId,
+        creatorId = creatorId
     )
 }
 
-fun ProjectAggregateState.update(title: String, description: String): ProjectUpdatedEvent {
+fun ProjectAggregateState.update(title: String?, description: String?): ProjectUpdatedEvent {
     return ProjectUpdatedEvent(projectId = this.getId(), title = title, description = description)
 }
 
-fun ProjectAggregateState.addParticipant(taskId: UUID, userId: UUID): ProjectUserAddedEvent {
-    return ProjectUserAddedEvent(projectId = taskId, userId = userId)
+fun ProjectAggregateState.addParticipant(projectId: UUID, userId: UUID): ProjectUserAddedEvent {
+    return ProjectUserAddedEvent(projectId = projectId, userId = userId)
 }
 
-fun ProjectAggregateState.removeParticipant(taskId: UUID, userId: UUID): ProjectUserRemovedEvent {
-    return ProjectUserRemovedEvent(projectId = taskId, userId = userId)
+fun ProjectAggregateState.removeParticipant(projectId: UUID, userId: UUID): ProjectUserRemovedEvent {
+    return ProjectUserRemovedEvent(projectId = projectId, userId = userId)
 }
 
 fun ProjectAggregateState.addTask(name: String): TaskCreatedEvent {

@@ -11,11 +11,11 @@ class ProjectAggregateState : AggregateState<UUID, ProjectAggregate> {
     var createdAt: Long = System.currentTimeMillis()
     var updatedAt: Long = System.currentTimeMillis()
 
-    lateinit var projectTitle: String
+    private lateinit var projectTitle: String
     private var projectDescription: String = ""
 
 
-    lateinit var creatorId: String
+    private lateinit var creatorId: UUID
     var participants = mutableMapOf<UUID, ParticipantEntity>()
     var tasks = mutableMapOf<UUID, TaskEntity>()
     var projectTags = mutableMapOf<UUID, TagEntity>()
@@ -34,8 +34,13 @@ class ProjectAggregateState : AggregateState<UUID, ProjectAggregate> {
     @StateTransitionFunc
     fun projectUpdatedApply(event: ProjectUpdatedEvent) {
         projectId = event.projectId
-        projectTitle = event.title
-        projectDescription = event.description
+
+        if (event.title != null)
+            projectTitle = event.title
+
+        if (event.description != null)
+            projectDescription = event.description
+
         updatedAt = createdAt
     }
 
@@ -45,7 +50,7 @@ class ProjectAggregateState : AggregateState<UUID, ProjectAggregate> {
         updatedAt = event.createdAt
     }
 
-    //TODO Delete also from all tasks entities
+    // TODO Delete also from all tasks entities
     @StateTransitionFunc
     fun projectUserRemovedApply(event: ProjectUserRemovedEvent) {
         participants.remove(event.userId)
@@ -54,27 +59,17 @@ class ProjectAggregateState : AggregateState<UUID, ProjectAggregate> {
 
     @StateTransitionFunc
     fun taskUpdatedApply(event: TaskUpdatedEvent) {
-        val task: TaskEntity? = tasks[event.taskId]
-        if (task == null) {
-            throw IllegalStateException("task not found")
-        }
+        val task: TaskEntity = tasks[event.taskId] ?: throw IllegalStateException("Task not found")
 
         task.name = event.taskName
         task.description = event.taskDescription
-
     }
 
     @StateTransitionFunc
     fun taskExecutorAddedApply(event: TaskExecutorAddedEvent) {
-        val task: TaskEntity? = tasks[event.taskId]
-        if (task == null) {
-            throw IllegalStateException("task not found")
-        }
+        val task: TaskEntity = tasks[event.taskId] ?: throw IllegalStateException("Task not found")
 
-        val participant: ParticipantEntity? = participants[event.userId]
-        if (participant == null) {
-            throw IllegalStateException("participant not found")
-        }
+        val participant: ParticipantEntity = participants[event.userId] ?: throw IllegalStateException("Participant not found")
 
         task.executor =  participant
         updatedAt = event.createdAt
@@ -121,7 +116,6 @@ data class ParticipantEntity (
  */
 @StateTransitionFunc
 fun ProjectAggregateState.tagAssignedApply(event: TagAssignedToTaskEvent) {
-    tasks[event.taskId]?.tagsAssigned?.add(event.tagId)
-        ?: throw IllegalArgumentException("No such task: ${event.taskId}")
+    tasks[event.taskId]?.tagsAssigned?.add(event.tagId) ?: throw IllegalArgumentException("No such task: ${event.taskId}")
     updatedAt = createdAt
 }
