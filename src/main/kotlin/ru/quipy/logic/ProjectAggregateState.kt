@@ -91,6 +91,11 @@ class ProjectAggregateState : AggregateState<UUID, ProjectAggregate> {
     }
 
     @StateTransitionFunc
+    fun tagDeletedApply(event: TagDeletedEvent) {
+        projectTags.remove(event.tagId)
+    }
+
+    @StateTransitionFunc
     fun taskCreatedApply(event: TaskCreatedEvent) {
         tasks[event.taskId] = TaskEntity(event.taskId, event.taskName, "", null, mutableSetOf())
         updatedAt = createdAt
