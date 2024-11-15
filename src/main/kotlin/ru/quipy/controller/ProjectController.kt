@@ -4,7 +4,7 @@ import org.springframework.web.bind.annotation.*
 import ru.quipy.api.*
 import ru.quipy.core.EventSourcingService
 import ru.quipy.logic.*
-import ru.quipy.models.*
+import ru.quipy.models.project.*
 import java.util.*
 
 @RestController

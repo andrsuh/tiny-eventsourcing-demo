@@ -1,4 +1,4 @@
-package ru.quipy.models
+package ru.quipy.models.project
 
 import com.fasterxml.jackson.annotation.JsonProperty
 

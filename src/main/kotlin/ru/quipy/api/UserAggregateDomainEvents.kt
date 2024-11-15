@@ -9,7 +9,7 @@ const val USER_CREATED_EVENT = "USER_CREATED_EVENT"
 @DomainEvent(name = USER_CREATED_EVENT)
 class UserCreatedEvent(
     val userId: UUID,
-    val username: UserName,
+    val username: Username,
     val login: String,
     val password: String,
     createdAt: Long = System.currentTimeMillis(),
@@ -18,9 +18,9 @@ class UserCreatedEvent(
     createdAt = createdAt,
 )
 
-data class UserName(
-    val name: String,
-    val surname: String,
-    val patronymic: String
+data class Username(
+    val firstName: String,
+    val lastName: String,
+    val middleName: String?
 )
 
