@@ -28,6 +28,8 @@ class ProjectAggregateState : AggregateState<UUID, ProjectAggregate> {
         projectId = event.projectId
         projectTitle = event.title
         creatorId = event.creatorId
+
+        participants[creatorId] = ParticipantEntity(id = creatorId)
         updatedAt = createdAt
     }
 
