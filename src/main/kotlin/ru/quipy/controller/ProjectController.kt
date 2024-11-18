@@ -14,6 +14,7 @@ class ProjectController(
     val userEsService: EventSourcingService<UUID, UserAggregate, UserAggregateState>
 ) {
 
+
     @PostMapping
     fun createProject(@RequestBody request: CreateProjectRequest, @RequestParam creatorId: UUID) : ProjectCreatedEvent {
         val user = userEsService.getState(creatorId)
