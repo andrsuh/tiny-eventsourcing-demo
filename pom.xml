@@ -9,10 +9,10 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>ru.quipy</groupId>
-	<artifactId>demo</artifactId>
+	<artifactId>team-6</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>demo</name>
-	<description>Demo project for Tiny Event Sourcing lib</description>
+	<name>team-6</name>
+	<description>Lab 6 for Event Sourcing</description>
 	<properties>
 		<java.version>11</java.version>
 		<kotlin.version>1.6.21</kotlin.version>
