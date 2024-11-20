@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import ru.quipy.controller.ProjectController
 import ru.quipy.controller.UserController
+import java.util.UUID
 
 @SpringBootTest
 class TaskManagerTests {
@@ -22,15 +23,15 @@ class TaskManagerTests {
                 "krugarrr",
                 "sashulkaterentulka",
                 "ppoklassniypredmet)")
+
         val receivedUser = userController.getAccount(createdUser.userId);
-        println()
         Assertions.assertNotNull(receivedUser)
         Assertions.assertEquals(createdUser.username, receivedUser?.username)
         Assertions.assertEquals(createdUser.userId, receivedUser?.getId())
     }
 
     @Test
-    fun createProjectAndAddParticipant() {
+    fun createProjectAndCheckForValidEntity() {
         val project = projectController.createProject(
                 "TaskManager",
                 "krugarrr",
@@ -38,11 +39,34 @@ class TaskManagerTests {
                 "Very cool and modern project made in USA, Omsk state")
 
 
-		val receivedProject = projectController.getProject(project.projectId)
-        Assertions.assertNotNull(receivedProject)
-		Assertions.assertEquals(1, receivedProject?.participants?.values?.count())
-		Assertions.assertEquals("krugarrr", receivedProject?.participants?.entries?.firstOrNull()?.value?.username)
+        val receivedProject = projectController.getProject(project.projectId)
+        Assertions.assertEquals("TaskManager", receivedProject?.projectName)
+        Assertions.assertEquals("krugarrr", receivedProject?.authorUsername)
+        Assertions.assertEquals("sashulkaterentulka", receivedProject?.authorFullName)
+    }
 
+    @Test
+    fun checkProjectForAuthorAsFirstParticipant() {
+        val project = projectController.createProject(
+                "TaskManager",
+                "krugarrr",
+                "sashulkaterentulka",
+                "Very cool and modern project made in USA, Omsk state")
+
+
+        val receivedProject = projectController.getProject(project.projectId)
+        Assertions.assertNotNull(receivedProject)
+        Assertions.assertEquals(1, receivedProject?.participants?.values?.count())
+        Assertions.assertEquals("krugarrr", receivedProject?.participants?.entries?.firstOrNull()?.value?.username)
+    }
+
+    @Test
+    fun addParticipantToProject() {
+        val project = projectController.createProject(
+                "TaskManager",
+                "krugarrr",
+                "sashulkaterentulka",
+                "Very cool and modern project made in USA, Omsk state")
 
 		projectController.addParticipant(
 				project.projectId,
@@ -58,7 +82,7 @@ class TaskManagerTests {
     }
 
     @Test
-    fun createTaskAndChangeStatus() {
+    fun createTaskWithInitialStatusAndCheckForValidEntity() {
         val project = projectController.createProject(
                 "TaskManager",
                 "krugarrr",
@@ -74,6 +98,19 @@ class TaskManagerTests {
         Assertions.assertEquals(1, receivedProject?.tasks?.values?.count())
         Assertions.assertEquals(1, receivedProject?.taskStatuses?.values?.count())
         Assertions.assertEquals(defaultStatus?.id, task?.taskStatusesAssigned?.first())
+    }
+
+    @Test
+    fun createTaskAndAddStatus() {
+        val project = projectController.createProject(
+                "TaskManager",
+                "krugarrr",
+                "sashulkaterentulka",
+                "Very cool and modern project made in USA, Omsk state")
+
+        projectController.createTask(project.projectId, "Watch skibidi guide")
+        val receivedProject = projectController.getProject(project.projectId)
+        val task = receivedProject?.tasks?.entries?.first()?.value
 
         projectController.createTaskStatus(project.projectId, "Done", "Red")
         val receivedProjectWithNewStatus = projectController.getProject(project.projectId)
@@ -82,6 +119,23 @@ class TaskManagerTests {
         Assertions.assertEquals(2, receivedProjectWithNewStatus?.taskStatuses?.values?.count())
         Assertions.assertNotNull(newTaskStatus)
         Assertions.assertEquals("Red", newTaskStatus?.colour)
+    }
+
+    @Test
+    fun checkForValidEntityOfNewStatus() {
+        val project = projectController.createProject(
+                "TaskManager",
+                "krugarrr",
+                "sashulkaterentulka",
+                "Very cool and modern project made in USA, Omsk state")
+
+        projectController.createTask(project.projectId, "Watch skibidi guide")
+        val receivedProject = projectController.getProject(project.projectId)
+        val task = receivedProject?.tasks?.entries?.first()?.value
+
+        projectController.createTaskStatus(project.projectId, "Done", "Red")
+        val receivedProjectWithNewStatus = projectController.getProject(project.projectId)
+        val newTaskStatus = receivedProjectWithNewStatus?.taskStatuses?.values?.filter { it.name == "Done" }?.first()
 
         //ну, простите уж)
         if (newTaskStatus != null) {
@@ -94,8 +148,8 @@ class TaskManagerTests {
         val updatedTask = receivedProjectWithNewTaskStatus?.tasks?.entries?.first()?.value
 
         Assertions.assertEquals(newTaskStatus?.id, updatedTask?.taskStatusesAssigned?.last())
-
     }
+
 
     @Test
     fun createTaskAndAssignParticipant() {
@@ -120,5 +174,108 @@ class TaskManagerTests {
         Assertions.assertEquals(participant.id, updatedTask?.performersAssigned?.first())
     }
 
+    @Test
+    fun createExistingStatus() {
+        val project = projectController.createProject(
+                "TaskManager",
+                "krugarrr",
+                "sashulkaterentulka",
+                "Very cool and modern project made in USA, Omsk state")
+
+
+        Assertions.assertThrows(
+                IllegalArgumentException::class.java) {
+            projectController.createTaskStatus(project.projectId, "Created", "Blue")
+        }
+    }
+
+    @Test
+    fun addExistingParticipant() {
+        val project = projectController.createProject(
+                "TaskManager",
+                "krugarrr",
+                "sashulkaterentulka",
+                "Very cool and modern project made in USA, Omsk state")
+
+
+        Assertions.assertThrows(
+                IllegalArgumentException::class.java) {
+            projectController.addParticipant(
+                    project.projectId,
+                    "krugarrr",
+                    "sashulkaterentulka"
+            )
+        }
+    }
+
+
+    @Test
+    fun subscribeNonExistingPaticipantToTask() {
+        val project = projectController.createProject(
+                "TaskManager",
+                "krugarrr",
+                "sashulkaterentulka",
+                "Very cool and modern project made in USA, Omsk state")
+
+
+        projectController.createTask(project.projectId, "Watch skibidi guide")
+        val createdUser = userController.registerUser(
+                "mistertvister",
+                "bivshiyministr",
+                "ppoklassniypredmet)")
+        val receivedProject = projectController.getProject(project.projectId)
+        val task = receivedProject?.tasks?.entries?.first()?.value
+        if (task != null) {
+            Assertions.assertThrows(
+                    IllegalArgumentException::class.java) {
+                projectController.addParticipant(project.projectId, task.id, createdUser.userId)
+            }
+
+        }
+    }
+
+    @Test
+    fun assignNonExistingStatus() {
+        val project = projectController.createProject(
+                "TaskManager",
+                "krugarrr",
+                "sashulkaterentulka",
+                "Very cool and modern project made in USA, Omsk state")
+
+
+        projectController.createTask(project.projectId, "Watch skibidi guide")
+        val receivedProject = projectController.getProject(project.projectId)
+        val task = receivedProject?.tasks?.entries?.first()?.value
+
+        if (task != null) {
+            Assertions.assertThrows(
+                    IllegalArgumentException::class.java) {
+                projectController.createTaskStatus(project.projectId, UUID.randomUUID(), task.id)
+            }
+
+        }
+    }
+
+    @Test
+    fun assignStatusToNonExistingTask() {
+        val project = projectController.createProject(
+                "TaskManager",
+                "krugarrr",
+                "sashulkaterentulka",
+                "Very cool and modern project made in USA, Omsk state")
+
+
+        projectController.createTask(project.projectId, "Watch skibidi guide")
+        projectController.createTaskStatus(project.projectId, "Done", "Red")
+        val receivedProjectWithNewStatus = projectController.getProject(project.projectId)
+        val newTaskStatus = receivedProjectWithNewStatus?.taskStatuses?.values?.filter { it.name == "Done" }?.first()
+          if (newTaskStatus != null) {
+            Assertions.assertThrows(
+                    IllegalArgumentException::class.java) {
+                projectController.createTaskStatus(project.projectId, newTaskStatus.id, UUID.randomUUID())
+            }
+
+        }
+    }
 
 }
