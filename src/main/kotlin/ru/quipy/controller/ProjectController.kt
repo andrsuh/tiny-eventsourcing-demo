@@ -9,13 +9,16 @@ import org.springframework.web.bind.annotation.RestController
 import ru.quipy.api.*
 import ru.quipy.core.EventSourcingService
 import ru.quipy.logic.*
+import ru.quipy.projections.entity.ProjectProjection
+import ru.quipy.projections.repository.ProjectProjectionRepository
 import java.util.*
 
 @RestController
 @RequestMapping("/projects")
 class ProjectController(
     val userEsService: EventSourcingService<UUID, UserAggregate, UserAggregateState>,
-    val projectEsService: EventSourcingService<UUID, ProjectAggregate, ProjectAggregateState>
+    val projectEsService: EventSourcingService<UUID, ProjectAggregate, ProjectAggregateState>,
+    private val projectProjectionRepository: ProjectProjectionRepository
 ) {
 
     @PostMapping("/create")
@@ -26,6 +29,11 @@ class ProjectController(
     }
 
     @GetMapping("/{projectId}")
+    fun getProject(@PathVariable projectId: UUID): ProjectProjection? {
+        return projectProjectionRepository.findById(projectId).orElse(null)
+    }
+
+    @GetMapping("/{projectId}/account")
     fun getAccount(@PathVariable projectId: UUID) : ProjectAggregateState? {
         return projectEsService.getState(projectId)
     }
