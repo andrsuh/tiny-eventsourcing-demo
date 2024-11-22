@@ -127,6 +127,7 @@ class ProjectProjectionTests {
         Assertions.assertNotNull(projectProjection)
         Assertions.assertEquals(null, projectProjection!!.statuses.find { it.name == statusName })
     }
+
 }
 
 
