@@ -47,6 +47,19 @@
 		</dependency>
 
 		<dependency>
+			<groupId>org.awaitility</groupId>
+			<artifactId>awaitility</artifactId>
+			<version>4.2.0</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.awaitility</groupId>
+			<artifactId>awaitility-kotlin</artifactId>
+			<version>4.2.0</version>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
 			<groupId>ru.quipy</groupId>
 			<artifactId>tiny-event-sourcing-spring-boot-starter</artifactId>
 			<version>${tiny.es.version}</version>
