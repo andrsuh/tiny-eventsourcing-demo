@@ -11,12 +11,15 @@ import ru.quipy.logic.ProjectAggregateState
 import ru.quipy.logic.auth.UserAggregateState
 import ru.quipy.streams.AggregateSubscriptionsManager
 import java.util.*
+import java.util.concurrent.ConcurrentHashMap
 import javax.annotation.PostConstruct
 
 @Service
 class ProjectEventsSubscriber {
 
     val logger: Logger = LoggerFactory.getLogger(ProjectEventsSubscriber::class.java)
+    @Autowired
+    val projectParticipants: ProjectParticipantsViewService = ProjectParticipantsViewService()
 
     @Autowired
     lateinit var subscriptionsManager: AggregateSubscriptionsManager
@@ -26,10 +29,12 @@ class ProjectEventsSubscriber {
         subscriptionsManager.createSubscriber(ProjectAggregate::class, "project-subscriber") {
 
             `when`(ProjectCreatedEvent::class) { event ->
+                projectParticipants.onProjectCreated(event)
                 logger.info("Project created: {}", event.title)
             }
 
             `when`(ParticipantAddedToProjectEvent::class) { event ->
+                projectParticipants.onParticipantAdded(event)
                 logger.info("Participant {} added to project", event.participantId)
             }
 
@@ -45,5 +50,9 @@ class ProjectEventsSubscriber {
                 logger.info("Assignee {} added to task {}", event.participantId, event.taskId)
             }
         }
+    }
+
+    fun getParticipants(projectId: UUID): List<UUID>? {
+        return projectParticipants.getParticipants(projectId)
     }
 }

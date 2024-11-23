@@ -39,7 +39,7 @@ class ProjectAggregateState : AggregateState<UUID, ProjectAggregate> {
             throw IllegalStateException("The user $participantId is already a member of the project $projectId")
         }
 
-        return ParticipantAddedToProjectEvent(participantId)
+        return ParticipantAddedToProjectEvent(participantId, projectId)
     }
 
     fun createStatus(name: String, color: String, participantId: UUID): StatusCreatedEvent {

@@ -30,6 +30,7 @@ class ProjectCreatedEvent(
 @DomainEvent(name = PARTICIPANT_ADDED_TO_PROJECT_EVENT)
 class ParticipantAddedToProjectEvent(
     val participantId: UUID,
+    val projectId: UUID,
     createdAt: Long = System.currentTimeMillis(),
 ) : Event<ProjectAggregate>(
     name = PARTICIPANT_ADDED_TO_PROJECT_EVENT,

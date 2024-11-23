@@ -7,13 +7,15 @@ import ru.quipy.core.EventSourcingService
 import ru.quipy.logic.ProjectAggregateState
 import ru.quipy.logic.auth.UserAggregateState
 import ru.quipy.logic.auth.UserAggregateState.Companion.usersAggregateId
+import ru.quipy.projections.ProjectEventsSubscriber
 import java.util.*
 
 @RestController
 @RequestMapping("/projects")
 class ProjectController(
     val projectEsService: EventSourcingService<UUID, ProjectAggregate, ProjectAggregateState>,
-    val userEsService: EventSourcingService<String, UserAggregate, UserAggregateState>
+    val userEsService: EventSourcingService<String, UserAggregate, UserAggregateState>,
+    val projectEventsSubscriber: ProjectEventsSubscriber
 ) {
 
     @PostMapping("/{projectTitle}")
@@ -118,6 +120,26 @@ class ProjectController(
         if (userEsService.getState(usersAggregateId)?.users?.containsKey(userId) == false) {
             throw IllegalArgumentException("User with id $userId does not exists")
         }
+    }
+
+    @GetMapping("/{projectId}/participants")
+    fun getProjectParticipants(
+        @PathVariable projectId: UUID,
+        @RequestParam participantId: UUID // The ID of the requesting participant
+    ): List<UUID>? {
+        // Check if the project exists
+        val projectState = projectEsService.getState(projectId)
+            ?: throw IllegalArgumentException("Project with id $projectId does not exists")
+
+        // Check if the requesting user is a participant
+        if (!projectState.participants.contains(participantId)) {
+            throw IllegalArgumentException("Participant with id $participantId does not belong to the project $projectId")
+        }
+
+        // Fetch participants from the projection
+        val participants = projectEventsSubscriber.getParticipants(projectId)
+
+        return participants
     }
 }
 

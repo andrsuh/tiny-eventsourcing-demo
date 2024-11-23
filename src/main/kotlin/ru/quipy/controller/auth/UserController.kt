@@ -36,6 +36,14 @@ class UserController(
     fun getUser(@PathVariable userId: UUID) : UserEntity? {
         return userEsService.getState(usersAggregateId)?.users?.get(userId)
     }
+
+    @GetMapping("/check")
+    fun checkNicknameExists(@RequestParam nickname: String): String {
+        val state = userEsService.getState(usersAggregateId)
+        val exists = state?.users?.values?.any { it.nickname == nickname } ?: false
+        return exists.toString()
+    }
+
 }
 
 data class CreateUserDto(
