@@ -31,5 +31,9 @@ class UserProjectionService {
     fun searchUsers(query: String): List<UserEntity> {
         return userRepository.findUserBySubstr(query)
     }
+
+    fun getAllUsers(): List<UserEntity> {
+        return userRepository.findAll();
+    }
 }
    

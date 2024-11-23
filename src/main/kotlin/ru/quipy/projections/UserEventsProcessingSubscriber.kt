@@ -40,4 +40,14 @@ class UserEventsProcessingSubscriber {
         }
         return newUsers.toList()
     }
+
+    fun checkIfNicknameExists(nickname: String): Boolean {
+        val users = userService.getAllUsers()
+        users.forEach{
+            if (it.nickname == nickname) {
+                return true
+            }
+        }
+        return false
+    }
 }

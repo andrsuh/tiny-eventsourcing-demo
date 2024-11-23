@@ -41,10 +41,8 @@ class UserController(
     }
 
     @GetMapping("/check")
-    fun checkNicknameExists(@RequestParam nickname: String): String {
-        val state = userEsService.getState(usersAggregateId)
-        val exists = state?.users?.values?.any { it.nickname == nickname } ?: false
-        return exists.toString()
+    fun checkNicknameExists(@RequestParam nickname: String): Boolean {
+        return userEventsSubscriber.checkIfNicknameExists(nickname)
     }
 
     @GetMapping("/find")
