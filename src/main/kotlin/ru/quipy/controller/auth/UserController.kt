@@ -7,12 +7,15 @@ import ru.quipy.core.EventSourcingService
 import ru.quipy.logic.auth.UserAggregateState
 import ru.quipy.logic.auth.UserAggregateState.Companion.usersAggregateId
 import ru.quipy.logic.auth.UserEntity
+import ru.quipy.projections.UserEventsProcessingSubscriber
+import ru.quipy.projections.dto.UserDto
 import java.util.*
 
 @RestController
 @RequestMapping("/users")
 class UserController(
     val userEsService: EventSourcingService<String, UserAggregate, UserAggregateState>,
+    val userEventsSubscriber: UserEventsProcessingSubscriber
 ) {
     @PostMapping("/create")
     fun createUser(
@@ -42,6 +45,11 @@ class UserController(
         val state = userEsService.getState(usersAggregateId)
         val exists = state?.users?.values?.any { it.nickname == nickname } ?: false
         return exists.toString()
+    }
+
+    @GetMapping("/find")
+    fun findBySubstr(@RequestParam substring: String): List<UserDto> {
+        return userEventsSubscriber.getUsersBySubstr(substring)
     }
 
 }
