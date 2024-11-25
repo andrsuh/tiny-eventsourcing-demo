@@ -41,6 +41,7 @@ class ParticipantAddedToProjectEvent(
 class StatusCreatedEvent(
     val statusName: String,
     val color: Color,
+    val projectId: UUID,
     createdAt: Long = System.currentTimeMillis(),
 ) : Event<ProjectAggregate>(
     name = STATUS_CREATED_EVENT,
@@ -62,6 +63,7 @@ class TaskCreatedEvent(
     val taskName: String,
     val description: String,
     val statusName: String,
+    val projectId: UUID,
     createdAt: Long = System.currentTimeMillis(),
 ) : Event<ProjectAggregate>(
     name = TASK_CREATED_EVENT,
@@ -121,6 +123,8 @@ class StatusOrderChangedEvent(
 class StatusColorChangedEvent(
     val statusName: String,
     val newColor: Color,
+    val projectId: UUID,
+
     createdAt: Long = System.currentTimeMillis()
 ) : Event<ProjectAggregate>(
     name = STATUS_COLOR_CHANGED_EVENT,
@@ -130,6 +134,7 @@ class StatusColorChangedEvent(
 @DomainEvent(name = STATUS_DELETED_EVENT)
 class StatusDeletedEvent(
     val statusName: String,
+    val projectId: UUID,
     createdAt: Long = System.currentTimeMillis()
 ) : Event<ProjectAggregate>(
     name = STATUS_DELETED_EVENT,

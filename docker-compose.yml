@@ -1,25 +1,25 @@
 version: "3.9"
 services:
-#  postgres:
-#    hostname: event_sourcing_db
-#    image: postgres:14.9-alpine
-#    env_file:
-#      - ./.env
-#    environment:
-#      POSTGRES_DB: ${POSTGRES_DB}
-#      POSTGRES_USER: ${POSTGRES_USER}
-#      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-#    ports:
-#      - ${POSTGRES_DB_PORT}:${POSTGRES_DB_PORT}
-#    restart: unless-stopped
-  mongo:
-    build:
-      context: mongoDb
-#      dockerfile: mongoDb/Dockerfile
-    restart: always
+  postgres:
+    hostname: event_sourcing_db
+    image: postgres:14.9-alpine
+    env_file:
+      - ./.env
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     ports:
-      - 27017:27017
-    volumes:
-      - mongo_data:/data/db
-volumes:
-  mongo_data: { }
+      - 6543:${POSTGRES_DB_PORT}
+    restart: unless-stopped
+#  mongo:
+#    build:
+#      context: mongoDb
+##      dockerfile: mongoDb/Dockerfile
+#    restart: always
+#    ports:
+#      - 27017:27017
+#    volumes:
+#      - mongo_data:/data/db
+#volumes:
+#  mongo_data: { }

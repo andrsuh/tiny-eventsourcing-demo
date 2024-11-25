@@ -8,6 +8,7 @@ import ru.quipy.logic.ProjectAggregateState
 import ru.quipy.logic.auth.UserAggregateState
 import ru.quipy.logic.auth.UserAggregateState.Companion.usersAggregateId
 import ru.quipy.projections.ProjectEventsSubscriber
+import ru.quipy.projections.ReturnStatusDto
 import java.util.*
 
 @RestController
@@ -42,7 +43,7 @@ class ProjectController(
         checkIfUserExists(dto.participantId)
 
         return projectEsService.update(projectId) {
-            it.createStatus(dto.name, dto.color, dto.participantId)
+            it.createStatus(dto.name, dto.color, dto.participantId, projectId)
         }
     }
 
@@ -103,7 +104,7 @@ class ProjectController(
         checkIfUserExists(participantId)
 
         return projectEsService.update(projectId) {
-            it.changeStatusColor(statusName, newColor, participantId)
+            it.changeStatusColor(statusName, newColor, participantId, projectId)
         }
     }
 
@@ -112,7 +113,7 @@ class ProjectController(
         checkIfUserExists(participantId)
 
         return projectEsService.update(projectId) {
-            it.deleteStatus(statusName, participantId)
+            it.deleteStatus(statusName, participantId, projectId)
         }
     }
 
@@ -141,6 +142,40 @@ class ProjectController(
 
         return participants
     }
+
+    @GetMapping("/{projectId}/tasks")
+    fun getProjectTasks(
+        @PathVariable projectId: UUID,
+        @RequestParam participantId: UUID // The ID of the requesting participant
+    ): List<UUID>? {
+        val projectState = projectEsService.getState(projectId)
+            ?: throw IllegalArgumentException("Project with id $projectId does not exists")
+
+        if (!projectState.participants.contains(participantId)) {
+            throw IllegalArgumentException("Participant with id $participantId does not belong to the project $projectId")
+        }
+
+        val participants = projectEventsSubscriber.getTasks(projectId)
+
+        return participants
+    }
+
+
+    @GetMapping("/{projectId}/status")
+    fun getProjectStatus(
+        @PathVariable projectId: UUID,
+        @RequestParam participantId: UUID
+    ): List<ReturnStatusDto>?{
+        val projectState = projectEsService.getState(projectId)
+            ?: throw IllegalArgumentException("Project with id $projectId does not exists")
+
+        if (!projectState.participants.contains(participantId)) {
+            throw IllegalArgumentException("Participant with id $participantId does not belong to the project $projectId")
+        }
+
+        val statuses = projectEventsSubscriber.getStatuses(projectId)
+        return statuses
+    }
 }
 
 data class CreateTaskDto(
@@ -154,3 +189,4 @@ data class CreateStatusDto(
     val color: String,
     val participantId: UUID
 )
+

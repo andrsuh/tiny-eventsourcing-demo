@@ -42,7 +42,7 @@ class ProjectAggregateState : AggregateState<UUID, ProjectAggregate> {
         return ParticipantAddedToProjectEvent(participantId, projectId)
     }
 
-    fun createStatus(name: String, color: String, participantId: UUID): StatusCreatedEvent {
+    fun createStatus(name: String, color: String, participantId: UUID, projectId: UUID): StatusCreatedEvent {
         checkIfProjectParticipant(participantId)
 
         if (orderState.values.find { x -> x.id.name.lowercase() == name.lowercase() } != null) {
@@ -51,7 +51,8 @@ class ProjectAggregateState : AggregateState<UUID, ProjectAggregate> {
 
         return StatusCreatedEvent(
             statusName = name,
-            color = Color.valueOf(color.uppercase())
+            color = Color.valueOf(color.uppercase()),
+            projectId
         )
     }
 
@@ -64,7 +65,8 @@ class ProjectAggregateState : AggregateState<UUID, ProjectAggregate> {
             taskId = id,
             taskName = name,
             description = description,
-            statusName = defaultStatus.id.name
+            statusName = defaultStatus.id.name,
+            projectId = projectId
         )
     }
 
@@ -108,14 +110,14 @@ class ProjectAggregateState : AggregateState<UUID, ProjectAggregate> {
         return StatusOrderChangedEvent(statusName, newOrder)
     }
 
-    fun changeStatusColor(statusName: String, newColor: String, participantId: UUID): StatusColorChangedEvent {
+    fun changeStatusColor(statusName: String, newColor: String, participantId: UUID, projectId: UUID): StatusColorChangedEvent {
         checkIfProjectParticipant(participantId)
         checkIfStatusExists(statusName)
 
-        return StatusColorChangedEvent(statusName, Color.valueOf(newColor.uppercase()))
+        return StatusColorChangedEvent(statusName, Color.valueOf(newColor.uppercase()), projectId)
     }
 
-    fun deleteStatus(statusName: String, participantId: UUID): StatusDeletedEvent {
+    fun deleteStatus(statusName: String, participantId: UUID, projectId: UUID): StatusDeletedEvent {
         checkIfProjectParticipant(participantId)
 
         if (statusName.lowercase() == defaultStatusName.lowercase()) throw IllegalArgumentException("Cannot delete default status")
@@ -124,7 +126,7 @@ class ProjectAggregateState : AggregateState<UUID, ProjectAggregate> {
         if (tasks.values.any { x -> x.status.name.lowercase() == statusName.lowercase() })
             throw IllegalStateException("Cannot delete status with tasks")
 
-        return StatusDeletedEvent(statusName)
+        return StatusDeletedEvent(statusName, projectId)
     }
 
     private fun checkIfStatusesAreOrdered(statusName: String, newOrder: Int) {
