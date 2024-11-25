@@ -19,4 +19,6 @@ class ProjectsStatusEntity (
     val name: String,
     @Column(name = "color", nullable = false)
     val color: Color
-    ): Serializable
+    ): Serializable{
+    constructor() : this(null, UUID.randomUUID(), "", Color.RED)
+}
