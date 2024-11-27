@@ -13,6 +13,7 @@ import ru.quipy.streams.AggregateSubscriptionsManager
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 import javax.annotation.PostConstruct
+import kotlin.math.log
 
 @Service
 class ProjectEventsSubscriber {
@@ -54,6 +55,10 @@ class ProjectEventsSubscriber {
                 logger.info("Status color changed: {}", event.newColor)
 
             }
+            `when`(StatusOrderChangedEvent::class) { event ->  
+                projectStatuses.onStatusOrderChanged(event)
+                logger.info("Status order changed: {}", event.statusName)
+            }
             `when`(StatusDeletedEvent::class) { event ->
                 projectStatuses.onStatusDeleted(event)
                 logger.info("Status was deleted: {}", event)
@@ -68,13 +73,17 @@ class ProjectEventsSubscriber {
                 projectTasks.onTaskNameChangedEvent(event)
                 logger.info("Task changed name: {}", event.newName)
             }
+            `when`(TaskStatusChangedEvent::class) { event ->
+                projectTasks.onTaskStatusChangedEvent(event)
+                logger.info("Task status changed: {}", event.taskId)
+            }
             `when`(TaskDeletedEvent::class) { event ->
                 projectTasks.onTaskDeletedEvent(event)
                 logger.info("Task was deleted: {}", event)
             }
             `when`(TaskAssigneeAddedEvent::class) { event ->
                 projectTasks.onTaskAssigneeAddedEvent(event)
-                logger.info("Task changed name: {}", event.participantId)
+                logger.info("Added new participant to task with participantId: {}", event.participantId)
             }
             `when`(TaskAssigneeAddedEvent::class) { event ->
                 logger.info("Assignee {} added to task {}", event.participantId, event.taskId)
@@ -82,11 +91,11 @@ class ProjectEventsSubscriber {
         }
     }
 
-    fun getParticipants(projectId: UUID): List<UUID>? {
+    fun getParticipants(projectId: UUID): List<ProjectParticipantDto>? {
         return projectParticipants.getParticipants(projectId)
     }
 
-    fun getTasks(projectId: UUID): List<UUID>? {
+    fun getTasks(projectId: UUID): List<ProjectTaskDto>? {
         return projectTasks.getTasks(projectId)
     }
 

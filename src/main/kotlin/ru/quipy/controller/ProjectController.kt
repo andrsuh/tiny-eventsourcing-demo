@@ -8,6 +8,8 @@ import ru.quipy.logic.ProjectAggregateState
 import ru.quipy.logic.auth.UserAggregateState
 import ru.quipy.logic.auth.UserAggregateState.Companion.usersAggregateId
 import ru.quipy.projections.ProjectEventsSubscriber
+import ru.quipy.projections.ProjectParticipantDto
+import ru.quipy.projections.ProjectTaskDto
 import ru.quipy.projections.ReturnStatusDto
 import java.util.*
 
@@ -95,7 +97,7 @@ class ProjectController(
     @PostMapping("/change-status-order/{projectId}")
     fun changeStatusOrder(@PathVariable projectId: UUID, @RequestParam statusName: String, @RequestParam newOrder: Int, @RequestParam participantId: UUID) : StatusOrderChangedEvent {
         return projectEsService.update(projectId) {
-            it.changeStatusOrder(statusName, newOrder, participantId)
+            it.changeStatusOrder(statusName, newOrder, participantId, projectId)
         }
     }
 
@@ -127,7 +129,7 @@ class ProjectController(
     fun getProjectParticipants(
         @PathVariable projectId: UUID,
         @RequestParam participantId: UUID // The ID of the requesting participant
-    ): List<UUID>? {
+    ): List<ProjectParticipantDto>? {
         // Check if the project exists
         val projectState = projectEsService.getState(projectId)
             ?: throw IllegalArgumentException("Project with id $projectId does not exists")
@@ -147,7 +149,7 @@ class ProjectController(
     fun getProjectTasks(
         @PathVariable projectId: UUID,
         @RequestParam participantId: UUID // The ID of the requesting participant
-    ): List<UUID>? {
+    ): List<ProjectTaskDto>? {
         val projectState = projectEsService.getState(projectId)
             ?: throw IllegalArgumentException("Project with id $projectId does not exists")
 

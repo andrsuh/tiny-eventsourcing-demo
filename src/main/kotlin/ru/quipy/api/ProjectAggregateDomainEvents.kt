@@ -113,6 +113,7 @@ class TaskDeletedEvent(
 class StatusOrderChangedEvent(
     val statusName: String,
     val newOrder: Int,
+    val projectId: UUID,
     createdAt: Long = System.currentTimeMillis()
 ) : Event<ProjectAggregate>(
     name = STATUS_ORDER_CHANGED_EVENT,

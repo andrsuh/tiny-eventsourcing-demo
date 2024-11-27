@@ -13,4 +13,6 @@ interface UserRepository : JpaRepository<UserEntity, UUID> {
     @Query("""SELECT u FROM UserEntity u WHERE u.name 
         LIKE LOWER(CONCAT('%', :substring, '%')) or u.nickname LIKE LOWER(CONCAT('%', :substring, '%'))""")
     fun findUserBySubstr(@Param("substring") substring: String): List<UserEntity>
+    fun findAllByUserIdIn(uuids: List<UUID>): List<UserEntity>
+    fun findByUserId(uuis: UUID): UserEntity?
 }

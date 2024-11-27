@@ -103,11 +103,11 @@ class ProjectAggregateState : AggregateState<UUID, ProjectAggregate> {
         return TaskDeletedEvent(taskId)
     }
 
-    fun changeStatusOrder(statusName: String, newOrder: Int, participantId: UUID): StatusOrderChangedEvent {
+    fun changeStatusOrder(statusName: String, newOrder: Int, participantId: UUID, projectId: UUID): StatusOrderChangedEvent {
         checkIfProjectParticipant(participantId)
         checkIfStatusesAreOrdered(statusName, newOrder)
 
-        return StatusOrderChangedEvent(statusName, newOrder)
+        return StatusOrderChangedEvent(statusName, newOrder, projectId)
     }
 
     fun changeStatusColor(statusName: String, newColor: String, participantId: UUID, projectId: UUID): StatusColorChangedEvent {

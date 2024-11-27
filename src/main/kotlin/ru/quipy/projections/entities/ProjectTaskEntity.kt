@@ -17,6 +17,8 @@ data class ProjectTaskEntity(
     var name: String,
     @Column(name = "description", nullable = false)
     val description: String,
+    @Column(name = "status_name", nullable = false)
+    var statusName: String,
 
     @ElementCollection
     @CollectionTable(name = "task_assignees", joinColumns = [JoinColumn(name = "task_id")])
