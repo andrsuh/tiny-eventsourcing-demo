@@ -12,8 +12,7 @@ import ru.quipy.api.UserAggregate
 import ru.quipy.core.EventSourcingService
 import ru.quipy.logic.*
 import ru.quipy.projections.entity.ProjectProjection
-import ru.quipy.projections.repository.ProjectProjectionRepository
-import ru.quipy.projections.repository.UserProjectionRepository
+import ru.quipy.projections.repository.TaskInfoRepository
 import java.util.*
 import java.util.concurrent.TimeUnit
 
@@ -29,7 +28,7 @@ class ProjectProjectionTests {
     lateinit var projectEsService: EventSourcingService<UUID, ProjectAggregate, ProjectAggregateState>
 
     @Autowired
-    lateinit var projectProjectionRepository: ProjectProjectionRepository
+    lateinit var projectProjectionRepository: TaskInfoRepository
 
     @Autowired
     lateinit var mongoTemplate: MongoTemplate
@@ -112,7 +111,7 @@ class ProjectProjectionTests {
         val projectId = UUID.randomUUID()
         val title = "title"
         val description = "description"
-        val statusName = "Status"
+        val statusName = "Status2"
 
         projectEsService.create { it.create(projectId, title, description) }
         val statusId = projectEsService.update(projectId) { it.createStatus(statusName) }.statusId
@@ -122,6 +121,9 @@ class ProjectProjectionTests {
         Awaitility.await().timeout(timeout_time, TimeUnit.SECONDS).untilAsserted {
             projectProjection = projectProjectionRepository.findById(projectId).orElse(null)
             Assertions.assertNotNull(projectProjection)
+            if (projectProjection != null) {
+                Assertions.assertEquals(null, projectProjection!!.statuses.find { it.name == statusName })
+            }
         }
 
         Assertions.assertNotNull(projectProjection)

@@ -1,11 +1,13 @@
 package ru.quipy.logic
 
+import org.springframework.transaction.annotation.Transactional
 import ru.quipy.api.ProjectAddedEvent
 import ru.quipy.api.ProjectCreatedEvent
 import ru.quipy.api.TaskCreatedEvent
 import ru.quipy.api.UserCreatedEvent
 import java.util.*
 
+@Transactional
 fun UserAggregateState.create(userId: UUID, login: String, password: String, username: String) : UserCreatedEvent {
     return UserCreatedEvent(
         userId = userId,

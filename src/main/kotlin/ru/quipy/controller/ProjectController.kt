@@ -10,7 +10,7 @@ import ru.quipy.api.*
 import ru.quipy.core.EventSourcingService
 import ru.quipy.logic.*
 import ru.quipy.projections.entity.ProjectProjection
-import ru.quipy.projections.repository.ProjectProjectionRepository
+import ru.quipy.projections.repository.TaskInfoRepository
 import java.util.*
 
 @RestController
@@ -18,7 +18,7 @@ import java.util.*
 class ProjectController(
     val userEsService: EventSourcingService<UUID, UserAggregate, UserAggregateState>,
     val projectEsService: EventSourcingService<UUID, ProjectAggregate, ProjectAggregateState>,
-    private val projectProjectionRepository: ProjectProjectionRepository
+    private val projectProjectionRepository: TaskInfoRepository
 ) {
 
     @PostMapping("/create")

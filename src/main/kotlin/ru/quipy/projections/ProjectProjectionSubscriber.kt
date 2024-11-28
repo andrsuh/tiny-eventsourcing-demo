@@ -6,14 +6,14 @@ import ru.quipy.api.*
 import ru.quipy.projections.entity.ProjectProjection
 import ru.quipy.projections.entity.StatusProjection
 import ru.quipy.projections.entity.TaskProjection
-import ru.quipy.projections.repository.ProjectProjectionRepository
+import ru.quipy.projections.repository.TaskInfoRepository
 import ru.quipy.streams.annotation.AggregateSubscriber
 import ru.quipy.streams.annotation.SubscribeEvent
 
 @Service
 @AggregateSubscriber(aggregateClass = ProjectAggregate::class, subscriberName = "project-projection-subscriber")
 class ProjectProjectionSubscriber(
-        private val projectProjectionRepository: ProjectProjectionRepository
+        private val projectProjectionRepository: TaskInfoRepository
 ) {
     private val logger = LoggerFactory.getLogger(ProjectProjectionSubscriber::class.java)
 

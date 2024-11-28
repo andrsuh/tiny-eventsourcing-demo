@@ -5,7 +5,7 @@ import ru.quipy.api.*
 import ru.quipy.core.EventSourcingService
 import ru.quipy.logic.*
 import ru.quipy.projections.entity.ProjectProjection
-import ru.quipy.projections.repository.ProjectProjectionRepository
+import ru.quipy.projections.repository.TaskInfoRepository
 import ru.quipy.projections.entity.UserProjection
 import ru.quipy.projections.repository.UserProjectionRepository
 import java.util.*
@@ -16,7 +16,7 @@ class UserController(
         val userEsService: EventSourcingService<UUID, UserAggregate, UserAggregateState>,
         val projectEsService: EventSourcingService<UUID, ProjectAggregate, ProjectAggregateState>,
         private val userProjectionRepository: UserProjectionRepository,
-        private val projectProjectionRepository: ProjectProjectionRepository
+        private val projectProjectionRepository: TaskInfoRepository
 ) {
 
     @PostMapping("/register")

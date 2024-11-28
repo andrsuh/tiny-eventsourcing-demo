@@ -15,7 +15,6 @@ import ru.quipy.logic.UserAggregateState
 import ru.quipy.logic.addProject
 import ru.quipy.logic.create
 import ru.quipy.projections.entity.UserProjection
-import ru.quipy.projections.repository.ProjectProjectionRepository
 import ru.quipy.projections.repository.UserProjectionRepository
 import java.util.*
 import java.util.concurrent.TimeUnit
