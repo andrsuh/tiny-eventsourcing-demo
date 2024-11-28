@@ -105,7 +105,8 @@ class ProjectEventsSubscriber {
                 ReturnStatusDto(
                     name = entity.name,
                     color = entity.color.toString(),
-                    projectId = entity.projectId
+                    projectId = entity.projectId,
+                    order = entity.statusOrder
                 )
             }
     }
@@ -116,5 +117,6 @@ class ProjectEventsSubscriber {
 data class ReturnStatusDto(
     val name: String,
     val color: String,
+    val order: Int,
     val projectId: UUID
 )

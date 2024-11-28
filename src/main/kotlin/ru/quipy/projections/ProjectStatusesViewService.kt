@@ -22,7 +22,7 @@ class ProjectStatusesViewService {
     @SubscribeEvent
     @Transactional
     fun onStatusCreated(event: StatusCreatedEvent) {
-        val maxOrder = projectStatusRepository.findMaxOrder() ?: 0
+        val maxOrder = projectStatusRepository.findMaxOrder(event.projectId) ?: 0
         val status = ProjectsStatusEntity(
             projectId = event.projectId,
             name = event.statusName,
@@ -57,9 +57,9 @@ class ProjectStatusesViewService {
         val newOrder = event.newOrder
 
         if (currentOrder < newOrder) {
-            projectStatusRepository.decrementOrderBetween(currentOrder + 1, newOrder)
+            projectStatusRepository.decrementOrderBetween(currentOrder + 1, newOrder, event.projectId)
         } else if (currentOrder > newOrder) {
-            projectStatusRepository.incrementOrderBetween(newOrder, currentOrder - 1)
+            projectStatusRepository.incrementOrderBetween(newOrder, currentOrder - 1, event.projectId)
         }
 
         val updatedStatus = ProjectsStatusEntity(
@@ -79,7 +79,7 @@ class ProjectStatusesViewService {
         val existingStatus = projectStatusRepository.findByName(event.statusName, event.projectId)
         val order = existingStatus.statusOrder
         projectStatusRepository.delete(existingStatus)
-        projectStatusRepository.updateOrderAfterDelete(order)
+        projectStatusRepository.updateOrderAfterDelete(order, event.projectId)
     }
 
 

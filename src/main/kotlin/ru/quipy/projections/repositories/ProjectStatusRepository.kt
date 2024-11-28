@@ -18,18 +18,18 @@ interface ProjectStatusRepository : JpaRepository<ProjectsStatusEntity, UUID> {
     @Query("SELECT p FROM ProjectsStatusEntity p WHERE p.name = :name and p.projectId = :projectId")
     fun findByName(@Param("name") name: String, @Param("projectId") projectId: UUID): ProjectsStatusEntity
 
-    @Query("SELECT MAX(statusOrder) FROM ProjectsStatusEntity p")
-    fun findMaxOrder(): Int?
+    @Query("SELECT MAX(statusOrder) FROM ProjectsStatusEntity p WHERE projectId = :projectId")
+    fun findMaxOrder(@Param("projectId") projectId: UUID): Int?
 
     @Modifying
-    @Query("UPDATE ProjectsStatusEntity SET statusOrder = statusOrder - 1 WHERE statusOrder > :statusOrder")
-    fun updateOrderAfterDelete(@Param("statusOrder") statusOrder: Int)
+    @Query("UPDATE ProjectsStatusEntity SET statusOrder = statusOrder - 1 WHERE statusOrder > :statusOrder AND projectId = :projectId")
+    fun updateOrderAfterDelete(@Param("statusOrder") statusOrder: Int, @Param("projectId") projectId: UUID)
 
     @Modifying
-    @Query("UPDATE ProjectsStatusEntity SET statusOrder = statusOrder + 1 WHERE statusOrder BETWEEN :start AND :end")
-    fun incrementOrderBetween(@Param("start") start: Int, @Param("end") end: Int)
+    @Query("UPDATE ProjectsStatusEntity SET statusOrder = statusOrder + 1 WHERE statusOrder BETWEEN :start AND :end AND projectId = :projectId")
+    fun incrementOrderBetween(@Param("start") start: Int, @Param("end") end: Int, @Param("projectId") projectId: UUID)
 
     @Modifying
-    @Query("UPDATE ProjectsStatusEntity SET statusOrder = statusOrder - 1 WHERE statusOrder BETWEEN :start AND :end")
-    fun decrementOrderBetween(@Param("start") start: Int, @Param("end") end: Int)
+    @Query("UPDATE ProjectsStatusEntity SET statusOrder = statusOrder - 1 WHERE statusOrder BETWEEN :start AND :end AND projectId = :projectId")
+    fun decrementOrderBetween(@Param("start") start: Int, @Param("end") end: Int, @Param("projectId") projectId: UUID)
 }
