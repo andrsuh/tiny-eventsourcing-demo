@@ -20,9 +20,15 @@ data class ProjectTaskEntity(
     @Column(name = "status_name", nullable = false)
     var statusName: String,
 
-    @ElementCollection
-    @CollectionTable(name = "task_assignees", joinColumns = [JoinColumn(name = "task_id")])
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(
+        name = "task_assignees",
+        joinColumns = [JoinColumn(name = "task_id")] //, referencedColumnName = "task_id")]
+    )
     @Column(name = "participant_id")
     val assignees: MutableSet<UUID> = mutableSetOf()
-) : Serializable
+
+) : Serializable{
+    constructor() : this(null, UUID.randomUUID(), UUID.randomUUID(), "", "", "", mutableSetOf())
+}
 

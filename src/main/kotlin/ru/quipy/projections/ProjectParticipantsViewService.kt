@@ -26,19 +26,16 @@ class ProjectParticipantsViewService {
     @SubscribeEvent
     @Transactional
     fun onProjectCreated(event: ProjectCreatedEvent) {
-        // Initialize the project with the creator as the first participant
         val participant = ProjectParticipantEntity(projectId = event.projectId, participantId = event.creatorId)
         projectParticipantsRepository.save(participant)
     }
 
     @SubscribeEvent
     fun onParticipantAdded(event: ParticipantAddedToProjectEvent) {
-        // Add the participant to the project's participant list
         val participant = ProjectParticipantEntity(projectId = event.projectId, participantId = event.participantId)
         projectParticipantsRepository.save(participant)
     }
 
-    // Method to get participants of a project
     fun getParticipants(projectId: UUID): List<ProjectParticipantDto> {
         val participants = projectParticipantsRepository.findParticipantIdsByProjectId(projectId)
         val users = usersRepository.findAllByUserIdIn(participants).associateBy { it.userId }

@@ -35,7 +35,7 @@ class ProjectTasksViewService {
 
     @SubscribeEvent
     fun onTaskNameChangedEvent(event: TaskNameChangedEvent) {
-        val existingTask = projectTasksRepository.findById(event.taskId)
+        val existingTask = projectTasksRepository.findByTaskId(event.taskId)
         if (existingTask.isPresent) {
             val task = existingTask.get()
             task.name = event.newName
@@ -47,7 +47,7 @@ class ProjectTasksViewService {
 
     @SubscribeEvent
     fun onTaskStatusChangedEvent(event: TaskStatusChangedEvent) {
-        val existingTask = projectTasksRepository.findById(event.taskId)
+        val existingTask = projectTasksRepository.findByTaskId(event.taskId)
         if (existingTask.isPresent) {
             val task = existingTask.get()
             task.statusName = event.newStatusName
@@ -60,7 +60,7 @@ class ProjectTasksViewService {
 
     @SubscribeEvent
     fun onTaskDeletedEvent(event: TaskDeletedEvent) {
-        val existingTask = projectTasksRepository.findById(event.taskId)
+        val existingTask = projectTasksRepository.findByTaskId(event.taskId)
         if (existingTask.isPresent) {
             projectTasksRepository.delete(existingTask.get())
         } else {
@@ -70,7 +70,7 @@ class ProjectTasksViewService {
 
     @SubscribeEvent
     fun onTaskAssigneeAddedEvent(event: TaskAssigneeAddedEvent) {
-        val existingTask = projectTasksRepository.findById(event.taskId)
+        val existingTask = projectTasksRepository.findByTaskId(event.taskId)
         if (existingTask.isPresent) {
             val task = existingTask.get()
             task.assignees.add(event.participantId)

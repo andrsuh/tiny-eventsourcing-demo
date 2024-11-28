@@ -13,4 +13,7 @@ interface ProjectTaskRepository : JpaRepository<ProjectTaskEntity, UUID> {
 
     @Query("SELECT p FROM ProjectTaskEntity p WHERE p.projectId = :projectId")
     fun findTasksIdsByProjectId(@Param("projectId") projectId: UUID): List<ProjectTaskEntity>
+
+    @Query("SELECT p FROM ProjectTaskEntity p WHERE p.taskId = :taskId")
+    fun findByTaskId(@Param("taskId") taskId: UUID): Optional<ProjectTaskEntity>
 }

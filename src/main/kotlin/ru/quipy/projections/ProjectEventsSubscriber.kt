@@ -85,9 +85,6 @@ class ProjectEventsSubscriber {
                 projectTasks.onTaskAssigneeAddedEvent(event)
                 logger.info("Added new participant to task with participantId: {}", event.participantId)
             }
-            `when`(TaskAssigneeAddedEvent::class) { event ->
-                logger.info("Assignee {} added to task {}", event.participantId, event.taskId)
-            }
         }
     }
 

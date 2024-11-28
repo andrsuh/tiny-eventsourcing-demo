@@ -128,18 +128,15 @@ class ProjectController(
     @GetMapping("/{projectId}/participants")
     fun getProjectParticipants(
         @PathVariable projectId: UUID,
-        @RequestParam participantId: UUID // The ID of the requesting participant
+        @RequestParam participantId: UUID
     ): List<ProjectParticipantDto>? {
-        // Check if the project exists
         val projectState = projectEsService.getState(projectId)
             ?: throw IllegalArgumentException("Project with id $projectId does not exists")
 
-        // Check if the requesting user is a participant
         if (!projectState.participants.contains(participantId)) {
             throw IllegalArgumentException("Participant with id $participantId does not belong to the project $projectId")
         }
 
-        // Fetch participants from the projection
         val participants = projectEventsSubscriber.getParticipants(projectId)
 
         return participants
@@ -148,7 +145,7 @@ class ProjectController(
     @GetMapping("/{projectId}/tasks")
     fun getProjectTasks(
         @PathVariable projectId: UUID,
-        @RequestParam participantId: UUID // The ID of the requesting participant
+        @RequestParam participantId: UUID
     ): List<ProjectTaskDto>? {
         val projectState = projectEsService.getState(projectId)
             ?: throw IllegalArgumentException("Project with id $projectId does not exists")
