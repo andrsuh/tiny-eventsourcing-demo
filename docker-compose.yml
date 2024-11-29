@@ -10,16 +10,16 @@ services:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     ports:
-      - ${POSTGRES_DB_PORT}:${POSTGRES_DB_PORT}
+      - 6543:${POSTGRES_DB_PORT}
     restart: unless-stopped
-  mongo:
-    build:
-      context: mongoDb
-#      dockerfile: mongoDb/Dockerfile
-    restart: always
-    ports:
-      - 27017:27017
-    volumes:
-      - mongo_data:/data/db
-volumes:
-  mongo_data: { }
+#  mongo:
+#    build:
+#      context: mongoDb
+##      dockerfile: mongoDb/Dockerfile
+#    restart: always
+#    ports:
+#      - 27017:27017
+#    volumes:
+#      - mongo_data:/data/db
+#volumes:
+#  mongo_data: { }
