@@ -8,13 +8,14 @@ import java.util.*
 // Service's business logic
 class ProjectAggregateState : AggregateState<UUID, ProjectAggregate> {
     private lateinit var projectId: UUID
+    lateinit var baseStatus: StatusEntity
     var createdAt: Long = System.currentTimeMillis()
     var updatedAt: Long = System.currentTimeMillis()
 
     lateinit var projectTitle: String
-    lateinit var creatorId: String
+    lateinit var projectDescription: String
     var tasks = mutableMapOf<UUID, TaskEntity>()
-    var projectTags = mutableMapOf<UUID, TagEntity>()
+    var projectStatuses = mutableMapOf<UUID, StatusEntity>()
 
     override fun getId() = projectId
 
@@ -23,40 +24,86 @@ class ProjectAggregateState : AggregateState<UUID, ProjectAggregate> {
     fun projectCreatedApply(event: ProjectCreatedEvent) {
         projectId = event.projectId
         projectTitle = event.title
-        creatorId = event.creatorId
+        projectDescription = event.description
+        updatedAt = createdAt
+        baseStatus = StatusEntity(id=event.baseStatusId)
+        projectStatuses[baseStatus.id] = baseStatus
+    }
+
+    @StateTransitionFunc
+    fun projectUpdatedApply(event: ProjectUpdatedEvent) {
+        projectTitle = event.title
+        projectDescription = event.description
         updatedAt = createdAt
     }
 
     @StateTransitionFunc
-    fun tagCreatedApply(event: TagCreatedEvent) {
-        projectTags[event.tagId] = TagEntity(event.tagId, event.tagName)
+    fun statusCreatedApply(event: StatusCreatedEvent) {
+        projectStatuses[event.statusId] = StatusEntity(event.statusId, event.statusName, event.order)
         updatedAt = createdAt
     }
+
+    @StateTransitionFunc
+    fun statusDeletedApply(event: StatusDeletedEvent) {
+        projectStatuses.remove(event.statusId) ?: throw IllegalArgumentException("No such status: ${event.statusId}")
+        updatedAt = createdAt
+    }
+    
+    @StateTransitionFunc
+    fun statusOrderChangedApply(event: StatusOrderChangedEvent) {
+        event.order.forEach {
+            entry ->
+            if (projectStatuses[entry.key] == null) throw IllegalArgumentException("No such status: ${entry.key}")
+            projectStatuses[entry.key]!!.order = entry.value
+        }
+        updatedAt = createdAt
+    }
+
 
     @StateTransitionFunc
     fun taskCreatedApply(event: TaskCreatedEvent) {
-        tasks[event.taskId] = TaskEntity(event.taskId, event.taskName, mutableSetOf())
+        tasks[event.taskId] = TaskEntity(event.taskId, event.taskName, event.taskDescription, event.statusId)
+        updatedAt = createdAt
+    }
+
+    @StateTransitionFunc
+    fun taskUpdatedApply(event: TaskUpdatedEvent) {
+        if (tasks[event.taskId] == null) throw IllegalArgumentException("No such task: ${event.taskId}")
+        tasks[event.taskId]!!.name = event.taskName
+        tasks[event.taskId]!!.description = event.taskDescription
+        updatedAt = createdAt
+    }
+
+    @StateTransitionFunc
+    fun taskPerformerAssignedApply(event: PerformerAssignedToTaskEvent) {
+        if (tasks[event.taskId] == null) throw IllegalArgumentException("No such task: ${event.taskId}")
+        tasks[event.taskId]!!.performers.add(event.userId)
+        updatedAt = createdAt
+    }
+
+    @StateTransitionFunc
+    fun statusAssignedApply(event: StatusAssignedToTaskEvent) {
+        if (tasks[event.taskId] == null) throw IllegalArgumentException("No such task: ${event.taskId}")
+        tasks[event.taskId]!!.statusAssigned = event.statusId
         updatedAt = createdAt
     }
 }
 
 data class TaskEntity(
     val id: UUID = UUID.randomUUID(),
-    val name: String,
-    val tagsAssigned: MutableSet<UUID>
+    var name: String,
+    var description: String,
+    var statusAssigned: UUID,
+    val performers: ArrayList<UUID> = ArrayList<UUID>()
 )
 
-data class TagEntity(
+data class StatusEntity(
     val id: UUID = UUID.randomUUID(),
-    val name: String
+    val name: String = "CREATED",
+    var order: Int = 0
 )
 
 /**
  * Demonstrates that the transition functions might be representer by "extension" functions, not only class members functions
  */
-@StateTransitionFunc
-fun ProjectAggregateState.tagAssignedApply(event: TagAssignedToTaskEvent) {
-    tasks[event.taskId]?.tagsAssigned?.add(event.tagId)
-        ?: throw IllegalArgumentException("No such task: ${event.taskId}")
-    updatedAt = createdAt
-}
+

@@ -47,6 +47,19 @@
 		</dependency>
 
 		<dependency>
+			<groupId>org.awaitility</groupId>
+			<artifactId>awaitility</artifactId>
+			<version>4.2.0</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.awaitility</groupId>
+			<artifactId>awaitility-kotlin</artifactId>
+			<version>4.2.0</version>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
 			<groupId>ru.quipy</groupId>
 			<artifactId>tiny-event-sourcing-spring-boot-starter</artifactId>
 			<version>${tiny.es.version}</version>
@@ -58,7 +71,31 @@
 			<version>${tiny.es.version}</version>
 		</dependency>
 
-<!--		<dependency>-->
+		<dependency>
+			<groupId>org.springdoc</groupId>
+			<artifactId>springdoc-openapi-data-rest</artifactId>
+			<version>1.8.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springdoc</groupId>
+			<artifactId>springdoc-openapi-ui</artifactId>
+			<version>1.8.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springdoc</groupId>
+			<artifactId>springdoc-openapi-kotlin</artifactId>
+			<version>1.8.0</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.mockito.kotlin</groupId>
+			<artifactId>mockito-kotlin</artifactId>
+			<version>5.1.0</version>
+			<scope>test</scope>
+		</dependency>
+
+
+		<!--		<dependency>-->
 <!--			<groupId>ru.quipy</groupId>-->
 <!--			<artifactId>tiny-mongo-event-store-spring-boot-starter</artifactId>-->
 <!--			<version>${tiny.es.version}</version>-->
@@ -94,5 +131,4 @@
 			</plugin>
 		</plugins>
 	</build>
-
 </project>
