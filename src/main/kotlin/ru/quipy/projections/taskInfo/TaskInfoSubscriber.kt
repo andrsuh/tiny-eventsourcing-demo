@@ -42,7 +42,7 @@ class TaskInfoSubscriber (
 
         @SubscribeEvent
     fun onPerformerAssignedToTask(event: PerformerAssignedToTaskEvent) {
-        val task = taskInfoRepository.findById(event.projectId).orElse(null)
+        val task = taskInfoRepository.findById(event.taskId).orElse(null)
         if (task != null) {
             if (!task.performers.contains(event.userId)) {
                     task.performers.add(event.userId)
