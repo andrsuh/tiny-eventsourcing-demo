@@ -9,9 +9,10 @@ import org.springframework.web.bind.annotation.RestController
 import ru.quipy.api.*
 import ru.quipy.core.EventSourcingService
 import ru.quipy.logic.*
-import ru.quipy.projections.entity.ProjectProjection
+import ru.quipy.projections.entity.StatusesWithTasksProjection
 import ru.quipy.projections.projectParticipants.ProjectParticipantService
 import ru.quipy.projections.repository.TaskInfoRepository
+import ru.quipy.projections.statusesWithTasks.StatusesWithTasksServices
 import ru.quipy.projections.views.ProjectParticipantsView
 import java.util.*
 
@@ -21,6 +22,7 @@ class ProjectController(
     val userEsService: EventSourcingService<UUID, UserAggregate, UserAggregateState>,
     val projectEsService: EventSourcingService<UUID, ProjectAggregate, ProjectAggregateState>,
     val projectParticipantService: ProjectParticipantService,
+    val statusesWithTasksServices: StatusesWithTasksServices,
     private val projectProjectionRepository: TaskInfoRepository
 ) {
 
@@ -32,8 +34,8 @@ class ProjectController(
     }
 
     @GetMapping("/{projectId}")
-    fun getProject(@PathVariable projectId: UUID): ProjectProjection? {
-        return projectProjectionRepository.findById(projectId).orElse(null)
+    fun getProject(@PathVariable projectId: UUID): StatusesWithTasksProjection? {
+        return statusesWithTasksServices.getStatusesByProjectById(projectId)
     }
 
     @GetMapping("/{projectId}/users")

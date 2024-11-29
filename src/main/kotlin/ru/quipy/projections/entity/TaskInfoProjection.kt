@@ -7,13 +7,8 @@ import java.util.*
 @Document(collection = "task-info")
 data class TaskInfoProjection (
     @Id
-    val taskId: UUID,
-    val taskName: String,
-    val taskDescription: String,
-    val performers: MutableList<PerformerProjection> = mutableListOf(),
-)
-
-data class PerformerProjection (
-    val userId: UUID,
-    val userLogin: String,
+    var taskId: UUID,
+    var taskName: String,
+    var taskDescription: String,
+    val performers: ArrayList<UUID> = ArrayList<UUID>()
 )

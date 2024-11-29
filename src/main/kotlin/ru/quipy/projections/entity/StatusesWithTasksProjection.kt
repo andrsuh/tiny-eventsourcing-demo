@@ -15,11 +15,11 @@ data class StatusesWithTasksProjection (
 data class StatusesProjection (
     val statusId: UUID,
     val statusName: String,
-    val statusOrder: Int,
+    var statusOrder: Int,
     val tasks: MutableList<TasksProjection> = mutableListOf(),
 )
 
 data class TasksProjection (
     val taskId: UUID,
-    val taskName: String,
+    var taskName: String,
 )

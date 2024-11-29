@@ -8,7 +8,7 @@ import java.util.*
 // Service's business logic
 class ProjectAggregateState : AggregateState<UUID, ProjectAggregate> {
     private lateinit var projectId: UUID
-    var baseStatus: StatusEntity = StatusEntity()
+    lateinit var baseStatus: StatusEntity
     var createdAt: Long = System.currentTimeMillis()
     var updatedAt: Long = System.currentTimeMillis()
 
@@ -26,6 +26,7 @@ class ProjectAggregateState : AggregateState<UUID, ProjectAggregate> {
         projectTitle = event.title
         projectDescription = event.description
         updatedAt = createdAt
+        baseStatus = StatusEntity(id=event.baseStatusId)
         projectStatuses[baseStatus.id] = baseStatus
     }
 

@@ -23,6 +23,7 @@ class ProjectCreatedEvent(
     val projectId: UUID,
     val title: String,
     val description: String,
+    val baseStatusId: UUID,
     createdAt: Long = System.currentTimeMillis(),
 ) : Event<ProjectAggregate>(
     name = PROJECT_CREATED_EVENT,

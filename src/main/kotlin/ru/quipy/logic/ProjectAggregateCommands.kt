@@ -11,7 +11,8 @@ fun ProjectAggregateState.create(id: UUID, title: String, description: String): 
     return ProjectCreatedEvent(
         projectId = id,
         title = title,
-        description = description
+        description = description,
+        baseStatusId = UUID.randomUUID()
     )
 }
 

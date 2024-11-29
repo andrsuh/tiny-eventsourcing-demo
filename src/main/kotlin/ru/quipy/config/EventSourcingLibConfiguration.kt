@@ -10,11 +10,12 @@ import ru.quipy.core.EventSourcingServiceFactory
 import ru.quipy.logic.ProjectAggregateState
 import ru.quipy.logic.UserAggregateState
 import ru.quipy.projections.AnnotationBasedProjectEventsSubscriber
-import ru.quipy.projections.ProjectProjectionSubscriber
+import ru.quipy.projections.statusesWithTasks.StatusesWithTasksSubscriber
 import ru.quipy.projections.userProjects.UserProjectsSubscriber
 import ru.quipy.projections.UsersSubscriber
 import ru.quipy.projections.projectParticipants.ParticipantSubscriber
 import ru.quipy.projections.projectParticipants.ProjectParticipantSubscriber
+import ru.quipy.projections.taskInfo.TaskInfoSubscriber
 import ru.quipy.projections.userProjects.UserProjectServices
 import ru.quipy.projections.userProjects.UserProjectSubscriber
 import ru.quipy.streams.AggregateEventStreamManager
@@ -34,7 +35,7 @@ class EventSourcingLibConfiguration {
     private lateinit var projectEventSubscriber: AnnotationBasedProjectEventsSubscriber
 
     @Autowired
-    private lateinit var projectProjectionSubscriber: ProjectProjectionSubscriber
+    private lateinit var statusesWithTasksSubscriber: StatusesWithTasksSubscriber
 
     @Autowired
     private lateinit var userProjectionSubscriber: UsersSubscriber
@@ -58,6 +59,9 @@ class EventSourcingLibConfiguration {
     private lateinit var eventStreamManager: AggregateEventStreamManager
 
     @Autowired
+    private lateinit var taskInfoSubscriber: TaskInfoSubscriber
+
+    @Autowired
     private lateinit var userProjectServices: UserProjectServices
 
     @Bean
@@ -70,12 +74,13 @@ class EventSourcingLibConfiguration {
     @PostConstruct
     fun init() {
         subscriptionsManager.subscribe<ProjectAggregate>(projectEventSubscriber)
-        subscriptionsManager.subscribe<ProjectAggregate>(projectProjectionSubscriber)
+        subscriptionsManager.subscribe<ProjectAggregate>(statusesWithTasksSubscriber)
         subscriptionsManager.subscribe<UserAggregate>(userProjectionSubscriber)
         subscriptionsManager.subscribe<UserAggregate>(userProjectsSubscriber)
         subscriptionsManager.subscribe<ProjectAggregate>(userProjectSubscriber)
         subscriptionsManager.subscribe<ProjectAggregate>(projectParticipantSubscriber)
         subscriptionsManager.subscribe<UserAggregate>(participantSubscriber)
+        subscriptionsManager.subscribe<ProjectAggregate>(taskInfoSubscriber)
         eventStreamManager.maintenance {
             onRecordHandledSuccessfully { streamName, eventName ->
                 logger.info("Stream $streamName successfully processed record of $eventName")
