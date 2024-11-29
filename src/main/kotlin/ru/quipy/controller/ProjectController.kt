@@ -10,7 +10,9 @@ import ru.quipy.api.*
 import ru.quipy.core.EventSourcingService
 import ru.quipy.logic.*
 import ru.quipy.projections.entity.ProjectProjection
+import ru.quipy.projections.projectParticipants.ProjectParticipantService
 import ru.quipy.projections.repository.TaskInfoRepository
+import ru.quipy.projections.views.ProjectParticipantsView
 import java.util.*
 
 @RestController
@@ -18,6 +20,7 @@ import java.util.*
 class ProjectController(
     val userEsService: EventSourcingService<UUID, UserAggregate, UserAggregateState>,
     val projectEsService: EventSourcingService<UUID, ProjectAggregate, ProjectAggregateState>,
+    val projectParticipantService: ProjectParticipantService,
     private val projectProjectionRepository: TaskInfoRepository
 ) {
 
@@ -31,6 +34,11 @@ class ProjectController(
     @GetMapping("/{projectId}")
     fun getProject(@PathVariable projectId: UUID): ProjectProjection? {
         return projectProjectionRepository.findById(projectId).orElse(null)
+    }
+
+    @GetMapping("/{projectId}/users")
+    fun getProjectUsers(@PathVariable projectId: UUID): ProjectParticipantsView? {
+        return projectParticipantService.findUsersByProject(projectId)
     }
 
     @GetMapping("/{projectId}/account")

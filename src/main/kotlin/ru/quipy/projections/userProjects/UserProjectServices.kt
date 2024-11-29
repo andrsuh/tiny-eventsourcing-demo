@@ -1,13 +1,11 @@
-package ru.quipy.projections.services
+package ru.quipy.projections.userProjects
 
 import org.springframework.stereotype.Service
-import ru.quipy.projections.entity.UserProjectProjection
 import ru.quipy.projections.repository.UserProjectRepository
 import ru.quipy.projections.repository.UserProjectsRepository
 import ru.quipy.projections.views.ProjectView
 import ru.quipy.projections.views.UserProjectsView
 import java.util.ArrayList
-import java.util.Optional
 
 @Service
 class UserProjectServices(

@@ -16,7 +16,6 @@ import ru.quipy.streams.annotation.SubscribeEvent
 class UserProjectSubscriber(
     private val projectRepository: UserProjectRepository,
 ) {
-    private val logger = LoggerFactory.getLogger(UsersSubscriber::class.java)
 
     @SubscribeEvent
     fun onProjectCreated(event: ProjectCreatedEvent) {

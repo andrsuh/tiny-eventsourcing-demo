@@ -9,10 +9,5 @@ import java.util.*
 data class ProjectParticipantProjection (
     @Id
     val projectId: UUID,
-    val participants: MutableMap<UUID, ParticipantProjection> = mutableMapOf(),
-)
-
-data class ParticipantProjection (
-    val userId: UUID,
-    val userLogin: String,
+    val participants: ArrayList<UUID> = ArrayList<UUID>(),
 )

@@ -13,7 +13,9 @@ import ru.quipy.projections.AnnotationBasedProjectEventsSubscriber
 import ru.quipy.projections.ProjectProjectionSubscriber
 import ru.quipy.projections.userProjects.UserProjectsSubscriber
 import ru.quipy.projections.UsersSubscriber
-import ru.quipy.projections.services.UserProjectServices
+import ru.quipy.projections.projectParticipants.ParticipantSubscriber
+import ru.quipy.projections.projectParticipants.ProjectParticipantSubscriber
+import ru.quipy.projections.userProjects.UserProjectServices
 import ru.quipy.projections.userProjects.UserProjectSubscriber
 import ru.quipy.streams.AggregateEventStreamManager
 import ru.quipy.streams.AggregateSubscriptionsManager
@@ -44,6 +46,12 @@ class EventSourcingLibConfiguration {
     private lateinit var userProjectSubscriber: UserProjectSubscriber
 
     @Autowired
+    private lateinit var participantSubscriber: ParticipantSubscriber
+
+    @Autowired
+    private lateinit var projectParticipantSubscriber: ProjectParticipantSubscriber
+
+    @Autowired
     private lateinit var eventSourcingServiceFactory: EventSourcingServiceFactory
 
     @Autowired
@@ -66,6 +74,8 @@ class EventSourcingLibConfiguration {
         subscriptionsManager.subscribe<UserAggregate>(userProjectionSubscriber)
         subscriptionsManager.subscribe<UserAggregate>(userProjectsSubscriber)
         subscriptionsManager.subscribe<ProjectAggregate>(userProjectSubscriber)
+        subscriptionsManager.subscribe<ProjectAggregate>(projectParticipantSubscriber)
+        subscriptionsManager.subscribe<UserAggregate>(participantSubscriber)
         eventStreamManager.maintenance {
             onRecordHandledSuccessfully { streamName, eventName ->
                 logger.info("Stream $streamName successfully processed record of $eventName")

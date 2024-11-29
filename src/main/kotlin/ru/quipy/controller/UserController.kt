@@ -4,11 +4,10 @@ import org.springframework.web.bind.annotation.*
 import ru.quipy.api.*
 import ru.quipy.core.EventSourcingService
 import ru.quipy.logic.*
-import ru.quipy.projections.entity.ProjectProjection
 import ru.quipy.projections.repository.TaskInfoRepository
 import ru.quipy.projections.entity.UserProjection
 import ru.quipy.projections.repository.UserProjectionRepository
-import ru.quipy.projections.services.UserProjectServices
+import ru.quipy.projections.userProjects.UserProjectServices
 import ru.quipy.projections.views.UserProjectsView
 import java.util.*
 
