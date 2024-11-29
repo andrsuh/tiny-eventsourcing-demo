@@ -1,22 +1,19 @@
-package ru.quipy.projections.entity
+package ru.quipy.projections.views
 
 import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.index.Indexed
 import org.springframework.data.mongodb.core.mapping.Document
 import java.util.*
 
-@Document(collection = "user-projects")
-data class UserProjectsProjection (
-    @Id
+data class UserProjectsView (
     val userId: UUID,
-    @Indexed(unique = true)
     var userLogin: String,
     var username: String,
-    val projects: ArrayList<UUID> = ArrayList<UUID>(),
+    val projects: ArrayList<ProjectView> = ArrayList<ProjectView>(),
 )
 
 @Document(collection = "projects")
-data class UserProjectProjection (
+data class ProjectView (
     @Id
     val projectId: UUID,
     val title: String,
