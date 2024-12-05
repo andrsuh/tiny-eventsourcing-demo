@@ -9,15 +9,29 @@ import ru.quipy.logic.UserAggregateState
 import ru.quipy.logic.create
 import ru.quipy.models.user.CreateUserRequest
 import ru.quipy.models.user.UsernameDto
+import ru.quipy.projections.AnnotationBasedUserEventsSubscriber
+import ru.quipy.projections.view.UserInfoViewDomain
 import java.util.*
 
 @RestController
 @RequestMapping("/users")
-class UserController(val userEsService: EventSourcingService<UUID, UserAggregate, UserAggregateState>) {
+class UserController(
+    val userEsService: EventSourcingService<UUID, UserAggregate, UserAggregateState>,
+    val userService: AnnotationBasedUserEventsSubscriber
+) {
 
     @PostMapping
     fun createUser(@RequestBody request: CreateUserRequest) : UserCreatedEvent {
         return userEsService.create { it.create( UUID.randomUUID(), request.username.map(), request.login, request.password) }
+    }
+
+    @GetMapping("/{userId}")
+    fun getUser(@PathVariable userId: UUID): UserInfoViewDomain.UserDtoData {
+        return userService.getUser(userId)
+    }
+    @GetMapping("/all_users")
+    fun getAllUsers(): List<UserInfoViewDomain.UserDtoData>{
+        return userService.getAllUsers()
     }
 }
 

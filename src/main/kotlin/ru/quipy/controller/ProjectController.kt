@@ -5,13 +5,19 @@ import ru.quipy.api.*
 import ru.quipy.core.EventSourcingService
 import ru.quipy.logic.*
 import ru.quipy.models.project.*
+import ru.quipy.projections.AnnotationBasedProjectEventsSubscriber
+import ru.quipy.projections.view.ProjectInfoViewDomain
+import ru.quipy.projections.view.TagInfoViewDomain
+import ru.quipy.projections.view.TaskInfoViewDomain
+import ru.quipy.projections.view.UserInfoViewDomain
 import java.util.*
 
 @RestController
 @RequestMapping("/projects")
 class ProjectController(
     val projectEsService: EventSourcingService<UUID, ProjectAggregate, ProjectAggregateState>,
-    val userEsService: EventSourcingService<UUID, UserAggregate, UserAggregateState>
+    val userEsService: EventSourcingService<UUID, UserAggregate, UserAggregateState>,
+    val projectService: AnnotationBasedProjectEventsSubscriber
 ) {
 
 
@@ -21,11 +27,6 @@ class ProjectController(
         require(user != null) { "User should exist" }
 
         return projectEsService.create { it.create(UUID.randomUUID(), request.projectTitle, creatorId) }
-    }
-
-    @GetMapping("/{projectId}")
-    fun getProject(@PathVariable projectId: UUID) : ProjectAggregateState? {
-        return projectEsService.getState(projectId)
     }
 
     @PatchMapping("/{projectId}")
@@ -89,4 +90,57 @@ class ProjectController(
     fun removeTag(@PathVariable projectId: UUID, @PathVariable tagId: UUID) : TagDeletedEvent {
         return projectEsService.update(projectId) { it.removeTag(tagId) }
     }
+
+    @GetMapping("/{projectId}")
+    fun getProject(@PathVariable projectId: UUID) : ProjectInfoViewDomain.ProjectInfo {
+        return projectService.getProject(projectId)
+    }
+
+    @GetMapping("/all_projects")
+    fun getAllProjects(): List<ProjectInfoViewDomain.ProjectInfo> {
+        return projectService.getAllProjects()
+    }
+
+    @GetMapping("/{projectId}/participants")
+    fun getProjectParticipants(@PathVariable projectId: UUID): List<UserInfoViewDomain.UserDtoData>{
+        return projectService.getProjectParticipants(projectId)
+    }
+
+    @GetMapping("/{projectId}/tasks")
+    fun getProjectTasks(@PathVariable projectId: UUID): List<TaskInfoViewDomain.TaskInfo> {
+        return projectService.getProjectTasks(projectId)
+    }
+
+    @GetMapping("/{projectId}/tags")
+    fun getProjectTags(@PathVariable projectId: UUID): List<TagInfoViewDomain.TagInfo> {
+        return projectService.getProjectTags(projectId)
+    }
+
+    @GetMapping("/{projectId}/project_creator")
+    fun getProjectCreator(@PathVariable projectId: UUID): UserInfoViewDomain.UserDtoData? {
+        return projectService.getProjectCreator(projectId)
+    }
+
+    @GetMapping("/tasks/{taskId}")
+    fun getTask(@PathVariable taskId: UUID): TaskInfoViewDomain.TaskInfo {
+        return projectService.getTask(taskId)
+    }
+
+    @GetMapping("/tasks/{taskId}/assignee/")
+    fun getTaskAssignee(@PathVariable taskId: UUID): UserInfoViewDomain.UserDtoData? {
+        return projectService.getTaskAssignee(taskId)
+    }
+
+    @GetMapping("/tasks/{taskId}/tags")
+    fun getTaskTags(@PathVariable taskId: UUID): List<TagInfoViewDomain.TagInfo> {
+        return projectService.getTaskTags(taskId)
+    }
+
+    @GetMapping("/tags/{tagId}")
+    fun getTag(@PathVariable tagId: UUID): TagInfoViewDomain.TagInfo {
+        return projectService.getTag(tagId)
+    }
+
+
+
 }
