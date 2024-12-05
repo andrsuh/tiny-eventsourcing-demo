@@ -19,10 +19,10 @@ class UserController(
     val userEsService: EventSourcingService<UUID, UserAggregate, UserAggregateState>
 ) {
 
-    @GetMapping("/{userId}")
-    fun getUser(@PathVariable userId: UUID) : UserAggregateState? {
-        return userEsService.getState(userId)
-    }
+    // @GetMapping("/{userId}")
+    // fun getUser(@PathVariable userId: UUID) : UserAggregateState? {
+    //     return userEsService.getState(userId)
+    // }
 
     @PostMapping("")
     fun createUser(@RequestParam username: String, @RequestParam password: String) : UserCreatedEvent {

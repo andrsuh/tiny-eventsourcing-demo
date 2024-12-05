@@ -26,10 +26,10 @@ class ProjectController(
         }
     }
 
-    @GetMapping("{projectId}")
-    fun getProject(@PathVariable projectId: UUID) : ProjectAggregateState? {
-        return projectEsService.getState(projectId)
-    }
+    // @GetMapping("{projectId}")
+    // fun getProject(@PathVariable projectId: UUID) : ProjectAggregateState? {
+    //     return projectEsService.getState(projectId)
+    // }
 
     @PostMapping("/{projectId}/users")
     fun addUser(@PathVariable projectId: UUID, @RequestParam userId: UUID) : ProjectUserAddedEvent {
@@ -45,10 +45,10 @@ class ProjectController(
         }
     }
 
-    @GetMapping("{projectId}/users")
-    fun getUsers(@PathVariable projectId: UUID) : List<UUID>? {
-        return projectEsService.getState(projectId)?.members?.toList()
-    }
+    // @GetMapping("{projectId}/users")
+    // fun getUsers(@PathVariable projectId: UUID) : List<UUID>? {
+    //     return projectEsService.getState(projectId)?.members?.toList()
+    // }
 
     @PostMapping("/{projectId}/tasks")
     fun addTask(
@@ -74,15 +74,15 @@ class ProjectController(
         }
     }
 
-    @GetMapping("{projectId}/tasks")
-    fun getTask(@PathVariable projectId: UUID) : List<TaskEntity>? {
-        return projectEsService.getState(projectId)?.tasks?.values?.toList()
-    }
-
-    @GetMapping("{projectId}/task/{taskId}")
-    fun getTask(@PathVariable projectId: UUID, @PathVariable taskId: UUID) : TaskEntity? {
-        return projectEsService.getState(projectId)?.tasks?.get(taskId)
-    }
+    // @GetMapping("{projectId}/tasks")
+    // fun getTask(@PathVariable projectId: UUID) : List<TaskEntity>? {
+    //     return projectEsService.getState(projectId)?.tasks?.values?.toList()
+    // }
+    //
+    // @GetMapping("{projectId}/task/{taskId}")
+    // fun getTask(@PathVariable projectId: UUID, @PathVariable taskId: UUID) : TaskEntity? {
+    //     return projectEsService.getState(projectId)?.tasks?.get(taskId)
+    // }
 
     @PostMapping("/{projectId}/statuses")
     fun createStatus(
@@ -105,13 +105,13 @@ class ProjectController(
         }
     }
 
-    @GetMapping("{projectId}/statuses")
-    fun getStatus(@PathVariable projectId: UUID) : List<StatusEntity>? {
-        return projectEsService.getState(projectId)?.statuses?.values?.toList()
-    }
-
-    @GetMapping("{projectId}/status/{statusId}")
-    fun getStatus(@PathVariable projectId: UUID, @PathVariable statusId: UUID) : StatusEntity? {
-        return projectEsService.getState(projectId)?.statuses?.get(statusId)
-    }
+    // @GetMapping("{projectId}/statuses")
+    // fun getStatus(@PathVariable projectId: UUID) : List<StatusEntity>? {
+    //     return projectEsService.getState(projectId)?.statuses?.values?.toList()
+    // }
+    //
+    // @GetMapping("{projectId}/status/{statusId}")
+    // fun getStatus(@PathVariable projectId: UUID, @PathVariable statusId: UUID) : StatusEntity? {
+    //     return projectEsService.getState(projectId)?.statuses?.get(statusId)
+    // }
 }
