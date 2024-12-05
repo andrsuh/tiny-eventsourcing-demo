@@ -40,14 +40,23 @@ class UserEventsSubscriber(
 @Component
 class ProjectsSubscriber(
     private val projectsRepository: ProjectsRepository,
+    private val statusesRepository: StatusesRepository
 ) {
+
     @Autowired
     lateinit var subscriptionsManager: AggregateSubscriptionsManager
 
     @PostConstruct
     fun init() {
-        subscriptionsManager.createSubscriber(ProjectAggregate::class, "project-subscriber") {
+        subscriptionsManager.createSubscriber(ProjectAggregate::class, "project-created-subscriber") {
             `when`(ProjectCreatedEvent::class) { event ->
+                statusesRepository.save(
+                    Status(
+                        event.default_status_id,
+                        "default_name"
+                    )
+                )
+
                 projectsRepository.save(
                     Project(
                         projectId = event.projectId,
@@ -60,7 +69,7 @@ class ProjectsSubscriber(
             }
         }
 
-        subscriptionsManager.createSubscriber(ProjectAggregate::class, "project-subscriber") {
+        subscriptionsManager.createSubscriber(ProjectAggregate::class, "project-user-added-subscriber") {
             `when`(ProjectUserAddedEvent::class) { event ->
                 val project = projectsRepository.findByProjectId(event.projectId)
                 project.participants.add(event.userId)
@@ -68,7 +77,7 @@ class ProjectsSubscriber(
             }
         }
 
-        subscriptionsManager.createSubscriber(ProjectAggregate::class, "project-subscriber") {
+        subscriptionsManager.createSubscriber(ProjectAggregate::class, "project-user-removed-subscriber") {
             `when`(ProjectUserRemovedEvent::class) { event ->
                 val project = projectsRepository.findByProjectId(event.projectId)
                 project.participants.remove(event.userId)
@@ -89,7 +98,7 @@ class TaskSubscriber(
 
     @PostConstruct
     fun init() {
-        subscriptionsManager.createSubscriber(ProjectAggregate::class, "task-subscriber") {
+        subscriptionsManager.createSubscriber(ProjectAggregate::class, "task-created-subscriber") {
             `when`(ProjectTaskCreatedEvent::class) { event ->
                 tasksRepository.save(
                     Task(
@@ -106,7 +115,7 @@ class TaskSubscriber(
             }
         }
 
-        subscriptionsManager.createSubscriber(ProjectAggregate::class, "task-subscriber") {
+        subscriptionsManager.createSubscriber(ProjectAggregate::class, "task-modified-subscriber") {
             `when`(ProjectTaskModifiedEvent::class) { event ->
                 val task = tasksRepository.findByTaskId(event.taskId)
                 tasksRepository.save(
@@ -135,7 +144,7 @@ class StatusSubscriber(
 
     @PostConstruct
     fun init() {
-        subscriptionsManager.createSubscriber(ProjectAggregate::class, "status-subscriber") {
+        subscriptionsManager.createSubscriber(ProjectAggregate::class, "status-created-subscriber") {
             `when`(ProjectStatusCreatedEvent::class) { event ->
                 statusesRepository.save(Status(
                     statusId = event.statusId,
@@ -147,7 +156,7 @@ class StatusSubscriber(
             }
         }
 
-        subscriptionsManager.createSubscriber(ProjectAggregate::class, "status-subscriber") {
+        subscriptionsManager.createSubscriber(ProjectAggregate::class, "status-removed-subscriber") {
             `when`(ProjectStatusRemovedEvent::class) { event ->
                 statusesRepository.deleteById(event.statusId)
                 val project = projectsRepository.findByProjectId(event.projectId)
