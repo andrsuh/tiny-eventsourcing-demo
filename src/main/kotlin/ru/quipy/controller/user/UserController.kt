@@ -18,7 +18,7 @@ import ru.quipy.projections.UserViewService
 import java.util.*
 
 @RestController
-@RequestMapping("/projects")
+@RequestMapping("/users")
 class UserController(
     val userEsService: EventSourcingService<UUID, UserAggregate, UserAggregateState>,
     val userViewService: UserViewService,
