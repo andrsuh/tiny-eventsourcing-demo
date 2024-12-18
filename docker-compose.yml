@@ -15,7 +15,7 @@ services:
   mongo:
     build:
       context: mongoDb
-#      dockerfile: mongoDb/Dockerfile
+      dockerfile: mongoDb/Dockerfile
     restart: always
     ports:
       - 27017:27017

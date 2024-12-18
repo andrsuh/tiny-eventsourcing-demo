@@ -1,9 +1,6 @@
 package ru.quipy.logic
 
-import ru.quipy.api.ProjectCreatedEvent
-import ru.quipy.api.TagAssignedToTaskEvent
-import ru.quipy.api.TagCreatedEvent
-import ru.quipy.api.TaskCreatedEvent
+import ru.quipy.api.*
 import java.util.*
 
 
@@ -26,6 +23,7 @@ fun ProjectAggregateState.createTag(name: String): TagCreatedEvent {
     if (projectTags.values.any { it.name == name }) {
         throw IllegalArgumentException("Tag already exists: $name")
     }
+
     return TagCreatedEvent(projectId = this.getId(), tagId = UUID.randomUUID(), tagName = name)
 }
 
@@ -39,4 +37,36 @@ fun ProjectAggregateState.assignTagToTask(tagId: UUID, taskId: UUID): TagAssigne
     }
 
     return TagAssignedToTaskEvent(projectId = this.getId(), tagId = tagId, taskId = taskId)
+}
+
+fun ProjectAggregateState.addMember(userId: UUID): MemberAddedEvent{
+    if (members.contains(userId)) {
+        throw IllegalArgumentException("Project already contains member: $userId")
+    }
+
+    return MemberAddedEvent(projectId = this.getId(), userId = userId)
+}
+
+fun ProjectAggregateState.changeStatus(taskId: UUID, newStatus: Int): TaskStatusChangedEvent{
+    if (!tasks.containsKey(taskId)) {
+        throw IllegalArgumentException("Task doesn't exists: $taskId")
+    }
+
+    if (StatusEnum.values().size < newStatus) {
+        throw IllegalArgumentException("Status out of range: $newStatus")
+    }
+
+    return TaskStatusChangedEvent(projectId = this.getId(), taskId = taskId, newStatus = newStatus)
+}
+
+fun ProjectAggregateState.addExecutor(taskId: UUID, executorId: UUID): ExecutorAssignedToTaskEvent{
+    if (!tasks.containsKey(taskId)) {
+        throw IllegalArgumentException("Task doesn't exists: $taskId")
+    }
+
+    if(!members.contains(executorId)){
+        throw IllegalArgumentException("No such member: $executorId")
+    }
+
+    return ExecutorAssignedToTaskEvent(projectId = this.getId(), taskId = taskId, executorId = executorId)
 }

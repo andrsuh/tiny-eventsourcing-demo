@@ -15,6 +15,7 @@ class ProjectAggregateState : AggregateState<UUID, ProjectAggregate> {
     lateinit var creatorId: String
     var tasks = mutableMapOf<UUID, TaskEntity>()
     var projectTags = mutableMapOf<UUID, TagEntity>()
+    var members = mutableSetOf<UUID>()
 
     override fun getId() = projectId
 
@@ -30,26 +31,52 @@ class ProjectAggregateState : AggregateState<UUID, ProjectAggregate> {
     @StateTransitionFunc
     fun tagCreatedApply(event: TagCreatedEvent) {
         projectTags[event.tagId] = TagEntity(event.tagId, event.tagName)
-        updatedAt = createdAt
+        updatedAt = event.createdAt
     }
 
     @StateTransitionFunc
     fun taskCreatedApply(event: TaskCreatedEvent) {
-        tasks[event.taskId] = TaskEntity(event.taskId, event.taskName, mutableSetOf())
-        updatedAt = createdAt
+        tasks[event.taskId] = TaskEntity(event.taskId, event.taskName, mutableSetOf(), mutableSetOf())
+        updatedAt = event.createdAt
+    }
+
+    @StateTransitionFunc
+    fun memberAddedApply(event: MemberAddedEvent) {
+        members.add(event.userId)
+        updatedAt = event.createdAt
+    }
+
+    @StateTransitionFunc
+    fun executorAssignedApply(event: ExecutorAssignedToTaskEvent) {
+        tasks[event.taskId]?.executorsAssigned?.add(event.executorId)
+                ?: throw IllegalArgumentException("No such task: ${event.taskId}")
+        updatedAt = event.createdAt
+    }
+
+    @StateTransitionFunc
+    fun statusChangedApply(event: TaskStatusChangedEvent) {
+        tasks[event.taskId]?.statusEnum = StatusEnum.values()[event.newStatus]
     }
 }
 
 data class TaskEntity(
-    val id: UUID = UUID.randomUUID(),
-    val name: String,
-    val tagsAssigned: MutableSet<UUID>
+        val id: UUID = UUID.randomUUID(),
+        val name: String,
+        val tagsAssigned: MutableSet<UUID>,
+        val executorsAssigned: MutableSet<UUID>,
+        var statusEnum: StatusEnum = StatusEnum.OPENED
 )
 
 data class TagEntity(
-    val id: UUID = UUID.randomUUID(),
-    val name: String
+        val id: UUID = UUID.randomUUID(),
+        val name: String
 )
+
+enum class StatusEnum(description: String){
+    OPENED("Opened"),
+    IN_PROGRESS("In progress"),
+    CLOSED("Closed");
+}
 
 /**
  * Demonstrates that the transition functions might be representer by "extension" functions, not only class members functions
@@ -57,6 +84,6 @@ data class TagEntity(
 @StateTransitionFunc
 fun ProjectAggregateState.tagAssignedApply(event: TagAssignedToTaskEvent) {
     tasks[event.taskId]?.tagsAssigned?.add(event.tagId)
-        ?: throw IllegalArgumentException("No such task: ${event.taskId}")
-    updatedAt = createdAt
+            ?: throw IllegalArgumentException("No such task: ${event.taskId}")
+    updatedAt = event.createdAt
 }
