@@ -15,7 +15,7 @@ class ProjectController(
     @PostMapping("")
     fun createProject(@RequestParam projectTitle: String, @RequestParam creatorId: UUID): ProjectCreatedEvent {
         return projectService.create {
-            it.create(UUID.randomUUID(), projectTitle, creatorId)
+            it.create(UUID.randomUUID(), projectTitle, creatorId, Status(UUID.randomUUID(), "CREATED", Color.WHITE))
         }
     }
 

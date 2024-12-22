@@ -25,9 +25,8 @@ class ProjectAggregateState : AggregateState<UUID, ProjectAggregate> {
         projectTitle = event.title
         creatorId = event.creatorId
         projectMembers.add(event.creatorId)
-        val statusUuid = UUID.randomUUID()
-        defaultStatus = statusUuid
-        statuses[statusUuid] = Status(defaultStatus, "CREATED", Color.WHITE)
+        defaultStatus = event.defaultStatus.id
+        statuses[defaultStatus] = event.defaultStatus
     }
 
     @StateTransitionFunc

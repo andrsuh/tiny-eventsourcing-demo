@@ -2,6 +2,7 @@ package ru.quipy.api
 
 import ru.quipy.core.annotations.DomainEvent
 import ru.quipy.domain.Event
+import ru.quipy.logic.Status
 import java.awt.Color
 import java.util.*
 
@@ -20,6 +21,7 @@ class ProjectCreatedEvent(
     val projectId: UUID,
     val title: String,
     val creatorId: UUID,
+    val defaultStatus: Status,
     createdAt: Long = System.currentTimeMillis(),
 ) : Event<ProjectAggregate>(
     name = PROJECT_CREATED_EVENT,
@@ -75,6 +77,7 @@ class TaskStatusChangedEvent(
 class TaskCreatedEvent(
         val taskId: UUID,
         val taskName: String,
+        val status: UUID,
         val projectId: UUID,
         val creatorId: UUID,
         createdAt: Long = System.currentTimeMillis(),

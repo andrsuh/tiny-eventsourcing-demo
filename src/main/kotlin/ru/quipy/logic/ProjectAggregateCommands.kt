@@ -9,11 +9,12 @@ import kotlin.streams.toList
 // Commands : takes something -> returns event
 // Here the commands are represented by extension functions, but also can be the class member functions
 
-fun ProjectAggregateState.create(id: UUID, title: String, creatorId: UUID): ProjectCreatedEvent {
+fun ProjectAggregateState.create(id: UUID, title: String, creatorId: UUID, defaultStatus: Status): ProjectCreatedEvent {
     return ProjectCreatedEvent(
             projectId = id,
             title = title,
             creatorId = creatorId,
+            defaultStatus = defaultStatus,
     )
 }
 
@@ -78,6 +79,7 @@ fun ProjectAggregateState.createTask(taskId: UUID, taskName: String, projectID: 
     return TaskCreatedEvent(
             taskId = taskId,
             taskName = taskName,
+            status = defaultStatus,
             projectId = projectID,
             creatorId = creatorId
     )
