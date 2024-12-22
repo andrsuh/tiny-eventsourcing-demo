@@ -58,11 +58,11 @@
 			<version>${tiny.es.version}</version>
 		</dependency>
 
-<!--		<dependency>-->
-<!--			<groupId>ru.quipy</groupId>-->
-<!--			<artifactId>tiny-mongo-event-store-spring-boot-starter</artifactId>-->
-<!--			<version>${tiny.es.version}</version>-->
-<!--		</dependency>-->
+		<dependency>
+			<groupId>ru.quipy</groupId>
+			<artifactId>tiny-mongo-event-store-spring-boot-starter</artifactId>
+			<version>${tiny.es.version}</version>
+		</dependency>
 	</dependencies>
 
 	<build>
@@ -92,7 +92,15 @@
 					</dependency>
 				</dependencies>
 			</plugin>
-		</plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>16</source>
+                    <target>16</target>
+                </configuration>
+            </plugin>
+        </plugins>
 	</build>
 
 </project>
